@@ -33,12 +33,14 @@ public class SpecialUnits {
             this.enabled = enabled;
         }
 
+        @SuppressWarnings("unchecked")
         public static MacroUnit of(Object ele) {
             if (ele instanceof Map) {
-                String key = (String) ((Map) ele).getOrDefault("key", InputConstants.UNKNOWN.getName());
-                KeyModifiers modifier = KeyModifiers.valueOf((String) ((Map) ele).getOrDefault("modifier", "NONE"));
-                String command = (String) ((Map) ele).getOrDefault("command", "");
-                boolean enabled = (boolean) ((Map) ele).getOrDefault("enabled", true);
+                Map<String, Object> map = (Map<String, Object>) ele;
+                String key = (String) map.getOrDefault("key", InputConstants.UNKNOWN.getName());
+                KeyModifiers modifier = KeyModifiers.valueOf((String) map.getOrDefault("modifier", "NONE"));
+                String command = (String) map.getOrDefault("command", "");
+                boolean enabled = (boolean) map.getOrDefault("enabled", true);
                 return new MacroUnit(key, modifier, command, enabled);
             } else if (ele instanceof MacroUnit) {
                 return (MacroUnit) ele;
@@ -47,7 +49,7 @@ public class SpecialUnits {
             }
         }
 
-        public static List<MacroUnit> fromList(List list) {
+        public static List<MacroUnit> fromList(List<Object> list) {
             List<MacroUnit> arr = new ArrayList<>();
             for (Object ele : list) {
                 arr.add(MacroUnit.of(ele));

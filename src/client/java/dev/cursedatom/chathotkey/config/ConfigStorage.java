@@ -2,6 +2,7 @@ package dev.cursedatom.chathotkey.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import dev.cursedatom.chathotkey.utils.ConfigUtils;
 import dev.cursedatom.chathotkey.utils.LoggerUtils;
 import net.minecraft.client.Minecraft;
@@ -24,7 +25,7 @@ public class ConfigStorage {
         readConfigFile(useDefault);
     }
 
-    public Map getHashmap() {
+    public Map<String, Object> getHashmap() {
         return configMap;
     }
 
@@ -50,7 +51,7 @@ public class ConfigStorage {
             } else {
                 reader = new InputStreamReader(new FileInputStream(FILE), StandardCharsets.UTF_8);
             }
-            configMap = GSON.fromJson(reader, Map.class);
+            configMap = GSON.fromJson(reader, new TypeToken<Map<String, Object>>(){}.getType());
         } catch (Exception e) {
             e.printStackTrace();
         }

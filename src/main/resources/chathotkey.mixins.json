@@ -3,7 +3,6 @@
 	"package": "dev.cursedatom.chathotkey.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

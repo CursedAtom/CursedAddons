@@ -2,6 +2,7 @@ package dev.cursedatom.chathotkey.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import dev.cursedatom.chathotkey.utils.ConfigScreenUtils;
 import dev.cursedatom.chathotkey.utils.ConfigUtils;
 import dev.cursedatom.chathotkey.utils.LoggerUtils;
@@ -33,7 +34,7 @@ public class ConfigScreenGenerator {
                 return;
             }
             Reader reader = new InputStreamReader(inputStream);
-            configGuiMap = GSON.fromJson(reader, Map.class);
+            configGuiMap = GSON.fromJson(reader, new TypeToken<Map<String, Object>>(){}.getType());
             configGuiMapInitialized = true;
         } catch (Exception e) {
             LoggerUtils.error("Failed to load config_gui.json: " + e.getMessage());
@@ -55,6 +56,7 @@ public class ConfigScreenGenerator {
         ConfigCategory mainCategory = builder.getOrCreateCategory(trans("gui.title")); // Use the main title as the category name
 
         if (configGuiMap != null && configGuiMap.containsKey("content")) {
+            @SuppressWarnings("unchecked")
             List<Map<String, Object>> entries = (List<Map<String, Object>>) configGuiMap.get("content");
             for (Map<String, Object> elementMap : entries) {
                 String type = (String) elementMap.get("type");

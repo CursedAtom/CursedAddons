@@ -5,7 +5,6 @@ import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.gui.entries.MultiElementListEntry;
 import me.shedaniel.clothconfig2.gui.entries.NestedListListEntry;
-import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;
 import net.minecraft.ChatFormatting;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.network.chat.Component;
@@ -32,7 +31,7 @@ public class ConfigScreenUtils {
         return tooltip;
     }
 
-    public static TooltipListEntry getEntryBuilder(ConfigEntryBuilder eb, String type, String key, String errorSupplier, int... args) {
+    public static AbstractConfigListEntry<?> getEntryBuilder(ConfigEntryBuilder eb, String type, String key, String errorSupplier, int... args) {
         Component tooltip = getTooltip(key, type);
         Object defVal = ConfigUtils.DEFAULT_CONFIG != null ? ConfigUtils.DEFAULT_CONFIG.get(key) : ConfigUtils.get(key);
         
@@ -42,10 +41,14 @@ public class ConfigScreenUtils {
                         .setDefaultValue((boolean) defVal).setTooltip(tooltip)
                         .setSaveConsumer(v -> ConfigUtils.set(key, v)).build();
             case "MacroList":
+                @SuppressWarnings("unchecked")
+                List<Object> currentList = (List<Object>) ConfigUtils.get(key);
+                @SuppressWarnings("unchecked")
+                List<Object> defaultList = (List<Object>) defVal;
                 return new NestedListListEntry<SpecialUnits.MacroUnit, MultiElementListEntry<SpecialUnits.MacroUnit>>(
-                        trans(key), SpecialUnits.MacroUnit.fromList((List) ConfigUtils.get(key)), true,
+                        trans(key), SpecialUnits.MacroUnit.fromList(currentList), true,
                         () -> Optional.of(new Component[]{tooltip}), v -> ConfigUtils.set(key, v),
-                        () -> SpecialUnits.MacroUnit.fromList((List) defVal),
+                        () -> SpecialUnits.MacroUnit.fromList(defaultList),
                         eb.getResetButtonKey(), true, true, (passedUnit, ignored) -> {
                     SpecialUnits.MacroUnit unit = (passedUnit == null) ? new SpecialUnits.MacroUnit() : passedUnit;
 

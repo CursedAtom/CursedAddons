@@ -21,8 +21,10 @@ public class Macro {
         
         Object macroListObj = ConfigUtils.get("chatkeybindings.Macro.List");
         if (macroListObj == null) return;
-        
-        for (SpecialUnits.MacroUnit macro : SpecialUnits.MacroUnit.fromList((List) macroListObj)) {
+
+        @SuppressWarnings("unchecked")
+        List<Object> macroList = (List<Object>) macroListObj;
+        for (SpecialUnits.MacroUnit macro : SpecialUnits.MacroUnit.fromList(macroList)) {
             if (macro.enabled && KeyboardUtils.isKeyPressingWithModifier(macro.key, macro.modifier)) {
                 if (!keyWasPressed.contains(macro)) {
                     keyWasPressed.add(macro);
