@@ -106,4 +106,4 @@ Contributions are welcome! If you have suggestions, bug reports, or want to cont
 ## License
 This project is licensed under the GNU General Public License v3.0. See the `LICENSE` file for more details.
 
-#### Big shout out to 70CentsApple for the [https://github.com/70CentsApple/ChatTools](original concept)!
+#### Big shout out to 70CentsApple for the (https://github.com/70CentsApple/ChatTools)[original concept]!
