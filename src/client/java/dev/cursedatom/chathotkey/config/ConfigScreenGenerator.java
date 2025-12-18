@@ -51,24 +51,28 @@ public class ConfigScreenGenerator {
                                              .setDefaultBackgroundTexture(backgroundTexture)
                                              .setTransparentBackground(true).setSavingRunnable(ConfigUtils::save);
         ConfigEntryBuilder eb = builder.entryBuilder();
-        
-        // Create a single category for all settings
-        ConfigCategory mainCategory = builder.getOrCreateCategory(trans("gui.title")); // Use the main title as the category name
 
-        if (configGuiMap != null && configGuiMap.containsKey("content")) {
+        if (configGuiMap != null && configGuiMap.containsKey("categories")) {
             @SuppressWarnings("unchecked")
-            List<Map<String, Object>> entries = (List<Map<String, Object>>) configGuiMap.get("content");
-            for (Map<String, Object> elementMap : entries) {
-                String type = (String) elementMap.get("type");
-                String key = (String) elementMap.get("key");
-                String errorSupplier = (String) elementMap.getOrDefault("errorSupplier", "null");
-                
-                mainCategory.addEntry(ConfigScreenUtils.getEntryBuilder(eb, type, key, errorSupplier));
+            List<Map<String, Object>> categories = (List<Map<String, Object>>) configGuiMap.get("categories");
+            for (Map<String, Object> categoryMap : categories) {
+                String categoryName = (String) categoryMap.get("name");
+                ConfigCategory category = builder.getOrCreateCategory(trans("gui.category." + categoryName.toLowerCase().replace(" ", "")));
+
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> entries = (List<Map<String, Object>>) categoryMap.get("content");
+                for (Map<String, Object> elementMap : entries) {
+                    String type = (String) elementMap.get("type");
+                    String key = (String) elementMap.get("key");
+                    String errorSupplier = (String) elementMap.getOrDefault("errorSupplier", "null");
+
+                    category.addEntry(ConfigScreenUtils.getEntryBuilder(eb, type, key, errorSupplier));
+                }
             }
         } else {
-            LoggerUtils.warn("configGuiMap is null or does not contain 'content' key. Config screen will be empty.");
+            LoggerUtils.warn("configGuiMap is null or does not contain 'categories' key. Config screen will be empty.");
         }
-       
+
         return builder;
     }
 }

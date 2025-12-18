@@ -1,17 +1,40 @@
 {
   "version": 1,
-  "content": [
+  "categories": [
     {
-      "type": "boolean",
-      "key": "general.PreviewClickEvents.Enabled"
+      "name": "General",
+      "content": [
+        {
+          "type": "boolean",
+          "key": "general.PreviewClickEvents.Enabled"
+        }
+      ]
     },
     {
-      "type": "boolean",
-      "key": "chatkeybindings.Macro.Enabled"
+      "name": "Chat Keybindings",
+      "content": [
+        {
+          "type": "boolean",
+          "key": "chatkeybindings.Macro.Enabled"
+        },
+        {
+          "type": "MacroList",
+          "key": "chatkeybindings.Macro.List"
+        }
+      ]
     },
     {
-      "type": "MacroList",
-      "key": "chatkeybindings.Macro.List"
+      "name": "Command Aliases",
+      "content": [
+        {
+          "type": "boolean",
+          "key": "commandaliases.Aliases.Enabled"
+        },
+        {
+          "type": "AliasList",
+          "key": "commandaliases.Aliases.List"
+        }
+      ]
     }
   ]
 }

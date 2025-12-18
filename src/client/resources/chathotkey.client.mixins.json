@@ -3,7 +3,8 @@
 	"package": "dev.cursedatom.chathotkey.mixin.client",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"ChatComponentMixin"
+		"ChatComponentMixin",
+		"ChatScreenMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -1,5 +1,8 @@
 {
   "key.chathotkey.gui.title": "Chat Hotkey Configuration",
+  "key.chathotkey.gui.category.general": "General",
+  "key.chathotkey.gui.category.chatkeybindings": "Chat Keybindings",
+  "key.chathotkey.gui.category.commandaliases": "Command Aliases",
   "key.chathotkey.general.PreviewClickEvents.Enabled": "Enable Click Events Preview",
   "key.chathotkey.general.PreviewClickEvents.Enabled.@Tooltip": "Preview events of the text you're hovering.",
   "key.chathotkey.chatkeybindings.Macro.Enabled": "Enable Command Keybindings",
@@ -16,6 +19,18 @@
   "key.chathotkey.chatkeybindings.Macro.List.Command.@Tooltip": "The command will be sent when this macro is activated.",
   "key.chathotkey.chatkeybindings.Macro.List.Enabled": "Enabled",
   "key.chathotkey.chatkeybindings.Macro.List.Enabled.@Tooltip": "Whether this macro is active or not.",
+  "key.chathotkey.commandaliases.Aliases.Enabled": "Enable Command Aliases",
+  "key.chathotkey.commandaliases.Aliases.Enabled.@Tooltip": "Toggles whether the command aliases below should work.",
+  "key.chathotkey.commandaliases.Aliases.List": "Command Aliases",
+  "key.chathotkey.commandaliases.Aliases.List.@Tooltip": "Define aliases for commands.",
+  "key.chathotkey.commandaliases.Aliases.List.@New": "New Alias",
+  "key.chathotkey.commandaliases.Aliases.List.@Display": "§e[ %s§e ]§r %s",
+  "key.chathotkey.commandaliases.Aliases.List.Alias": "Alias",
+  "key.chathotkey.commandaliases.Aliases.List.Alias.@Tooltip": "The alias to type (e.g., /s)",
+  "key.chathotkey.commandaliases.Aliases.List.Command": "Command",
+  "key.chathotkey.commandaliases.Aliases.List.Command.@Tooltip": "The command it expands to (e.g., /say)",
+  "key.chathotkey.commandaliases.Aliases.List.Enabled": "Enabled",
+  "key.chathotkey.commandaliases.Aliases.List.Enabled.@Tooltip": "Whether this alias is active.",
   "key.chathotkey.texts.variableType": "Variable Type: %s",
   "key.chathotkey.texts.PreviewClickEvents.overall": "§6Events:",
   "key.chathotkey.texts.PreviewClickEvents.insertion": "§c- §rShift + Click Insertion: %s",
@@ -29,5 +44,5 @@
   "key.chathotkey.texts.PreviewClickEvents.clickEvent.copyToClipboard": "§c - §rCopy To Clipboard: %s",
   "key.chathotkey.texts.PreviewClickEvents.clickEvent.custom": "§c - §rCustom: %s",
   "modmenu.nameTranslation.chathotkey": "Chat Hotkey",
-  "modmenu.descriptionTranslation.chathotkey": "A toolkit that provides Chat Keybindings and Preview Chat Events features."
+  "modmenu.descriptionTranslation.chathotkey": "A toolkit that provides Chat Keybindings, Command Aliases, and Preview Chat Events features."
 }

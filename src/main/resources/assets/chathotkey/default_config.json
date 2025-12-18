@@ -2,5 +2,7 @@
   "config.version": 1.0,
   "chatkeybindings.Macro.Enabled": true,
   "chatkeybindings.Macro.List": [],
+  "commandaliases.Aliases.Enabled": true,
+  "commandaliases.Aliases.List": [],
   "general.PreviewClickEvents.Enabled": true
 }

@@ -79,4 +79,67 @@ public class SpecialUnits {
             return "MacroUnit{key='" + key + "', modifier=" + modifier + ", command='" + command + "', enabled=" + enabled + "}";
         }
     }
+
+    public static class AliasUnit {
+        public String alias;
+        public String command;
+        public boolean enabled;
+
+        public AliasUnit() {
+            this.alias = "";
+            this.command = "";
+            this.enabled = true;
+        }
+
+        public AliasUnit(String alias, String command, boolean enabled) {
+            this.alias = alias;
+            this.command = command;
+            this.enabled = enabled;
+        }
+
+        @SuppressWarnings("unchecked")
+        public static AliasUnit of(Object ele) {
+            if (ele instanceof Map) {
+                Map<String, Object> map = (Map<String, Object>) ele;
+                String alias = (String) map.getOrDefault("alias", "");
+                String command = (String) map.getOrDefault("command", "");
+                boolean enabled = (boolean) map.getOrDefault("enabled", true);
+                return new AliasUnit(alias, command, enabled);
+            } else if (ele instanceof AliasUnit) {
+                return (AliasUnit) ele;
+            } else {
+                throw new IllegalArgumentException("Unexpected element type of Object: " + ele);
+            }
+        }
+
+        public static List<AliasUnit> fromList(List<Object> list) {
+            List<AliasUnit> arr = new ArrayList<>();
+            for (Object ele : list) {
+                arr.add(AliasUnit.of(ele));
+            }
+            return arr;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            AliasUnit aliasUnit = (AliasUnit) o;
+            return alias.equals(aliasUnit.alias) && command.equals(aliasUnit.command) && enabled == aliasUnit.enabled;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(alias, command, enabled);
+        }
+
+        @Override
+        public String toString() {
+            return "AliasUnit{alias='" + alias + "', command='" + command + "', enabled=" + enabled + "}";
+        }
+    }
 }

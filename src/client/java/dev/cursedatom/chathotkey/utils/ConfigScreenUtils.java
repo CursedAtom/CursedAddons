@@ -93,6 +93,48 @@ public class ConfigScreenUtils {
 
                     return new MultiElementListEntry<>(displayText, unit, entries, true);
                 });
+            case "AliasList":
+                @SuppressWarnings("unchecked")
+                List<Object> currentAliasList = (List<Object>) ConfigUtils.get(key);
+                @SuppressWarnings("unchecked")
+                List<Object> defaultAliasList = (List<Object>) defVal;
+                return new NestedListListEntry<SpecialUnits.AliasUnit, MultiElementListEntry<SpecialUnits.AliasUnit>>(
+                        trans(key), SpecialUnits.AliasUnit.fromList(currentAliasList), true,
+                        () -> Optional.of(new Component[]{tooltip}), v -> ConfigUtils.set(key, v),
+                        () -> SpecialUnits.AliasUnit.fromList(defaultAliasList),
+                        eb.getResetButtonKey(), true, true, (passedUnit, ignored) -> {
+                    SpecialUnits.AliasUnit unit = (passedUnit == null) ? new SpecialUnits.AliasUnit() : passedUnit;
+
+                    Component displayText;
+                    if (passedUnit == null || unit.alias.isEmpty()) {
+                        displayText = trans(key + ".@New");
+                    } else {
+                        MutableComponent displayBase = trans(key + ".@Display", "§6" + unit.alias, unit.command).copy();
+                        if (unit.enabled) {
+                            displayText = displayBase.withStyle(ChatFormatting.GREEN);
+                        } else {
+                            displayText = displayBase.withStyle(ChatFormatting.RED);
+                        }
+                    }
+
+                    List<AbstractConfigListEntry<?>> entries = new ArrayList<>();
+                    SpecialUnits.AliasUnit defaultObj = new SpecialUnits.AliasUnit();
+
+                    entries.add(eb.startStrField(trans(key + ".Alias"), unit.alias)
+                            .setTooltip(getTooltip(key + ".Alias", "String", unit.alias))
+                            .setDefaultValue(defaultObj.alias).setSaveConsumer(v -> unit.alias = v).build());
+
+                    entries.add(eb.startStrField(trans(key + ".Command"), unit.command)
+                            .setTooltip(getTooltip(key + ".Command", "String", unit.command))
+                            .setDefaultValue(defaultObj.command).setSaveConsumer(v -> unit.command = v).build());
+
+                    // Add "Enabled" toggle
+                    entries.add(eb.startBooleanToggle(trans(key + ".Enabled"), unit.enabled)
+                            .setTooltip(getTooltip(key + ".Enabled", "boolean", defaultObj.enabled))
+                            .setDefaultValue(defaultObj.enabled).setSaveConsumer(v -> unit.enabled = v).build());
+
+                    return new MultiElementListEntry<>(displayText, unit, entries, true);
+                });
             default:
                 return null;
         }
