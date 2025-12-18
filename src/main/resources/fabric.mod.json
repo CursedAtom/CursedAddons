@@ -3,15 +3,11 @@
 	"id": "chathotkey",
 	"version": "${version}",
 	"name": "ChatHotkey",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Add Hotkeys to chat messages in Minecraft",
 	"authors": [
-		"Me!"
+		"CursedAtom"
 	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
-	},
-	"license": "CC0-1.0",
+	"license": "GPL-3.0",
 	"icon": "assets/chathotkey/icon.png",
 	"environment": "*",
 	"entrypoints": {

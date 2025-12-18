@@ -4,7 +4,6 @@ import dev.cursedatom.chathotkey.command.CommandRegistry;
 import dev.cursedatom.chathotkey.config.ConfigScreenGenerator;
 import dev.cursedatom.chathotkey.features.chatkeybindings.Macro;
 import dev.cursedatom.chathotkey.utils.ConfigUtils;
-import dev.cursedatom.chathotkey.utils.LoggerUtils;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;

@@ -2,15 +2,12 @@ package dev.cursedatom.chathotkey.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
-import dev.cursedatom.chathotkey.config.ConfigScreenGenerator;
-import dev.cursedatom.chathotkey.utils.ConfigUtils;
 import dev.cursedatom.chathotkey.utils.LoggerUtils;
 import dev.cursedatom.chathotkey.utils.MessageUtils;
 import dev.cursedatom.chathotkey.utils.TextUtils;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 

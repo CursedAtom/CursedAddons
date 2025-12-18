@@ -3,10 +3,7 @@ package dev.cursedatom.chathotkey.utils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.HoverEvent;
 
-import java.net.URI;
 import java.util.List;
 
 public class TextUtils {
