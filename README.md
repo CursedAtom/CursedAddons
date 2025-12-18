@@ -1,10 +1,11 @@
 # ChatHotkey
 
 ## Description
-ChatHotkey is a Minecraft Fabric mod that allows you to add hotkeys to chat messages, making it easier and faster to send predefined messages in-game.
+ChatHotkey is a Minecraft Fabric mod that enhances chat functionality with keybindings, aliases, and preview features, making communication in-game faster and more convenient.
 
 ## Features
 *   **Command Keybindings**: Define custom hotkeys and key combinations (e.g., Shift+F1) to instantly send predefined chat messages or commands.
+*   **Command Aliases**: Create shortcuts for frequently used commands or messages (e.g., `/s` → `/say` or `/about` → `Hello, my name is Foo Bar`).
 *   **Click Events Preview**: When hovering over clickable text in chat, preview what actions will occur (opening URLs, running commands, copying to clipboard, etc.) before clicking.
 *   Seamless integration with Minecraft's chat system.
 
@@ -50,6 +51,22 @@ This feature allows you to create macros that send chat messages or commands whe
 5. Save and exit the config screen
 
 Example: Set Shift+F1 to send "/say Hello everyone!"
+
+#### Command Aliases
+This feature allows you to create shortcuts for commands or messages, expanding them when you type in chat.
+
+1. In the config screen, ensure "Enable Command Aliases" is checked
+2. Click "Command Aliases" to manage your aliases
+3. Click "New Alias" to add an alias
+4. Configure each alias:
+   - **Alias**: The shortcut you type (e.g., `/s` or `/about`)
+   - **Command**: What it expands to (e.g., `/say` or `Hello, my name is Foo Bar`)
+   - **Enabled**: Check to activate the alias
+5. Save and exit the config screen
+
+Examples:
+- `/s hello` → `/say hello` (command expansion)
+- `/about` → `Hello, my name is Foo Bar` (text message)
 
 #### Click Events Preview
 This feature shows a preview of what will happen when you click on interactive text in chat.
