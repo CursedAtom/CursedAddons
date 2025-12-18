@@ -1,0 +1,6 @@
+{
+  "config.version": 1.0,
+  "chatkeybindings.Macro.Enabled": true,
+  "chatkeybindings.Macro.List": [],
+  "general.PreviewClickEvents.Enabled": true
+}

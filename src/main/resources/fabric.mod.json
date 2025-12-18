@@ -1,0 +1,44 @@
+{
+	"schemaVersion": 1,
+	"id": "chathotkey",
+	"version": "${version}",
+	"name": "ChatHotkey",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/chathotkey/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"dev.cursedatom.chathotkey.ChatHotkey"
+		],
+		"client": [
+			"dev.cursedatom.chathotkey.ChatHotkeyClient"
+		],
+		"modmenu": [
+			"dev.cursedatom.chathotkey.modmenu.ChatHotkeyModMenuIntegration"
+		]
+	},
+	"mixins": [
+		"chathotkey.mixins.json",
+		{
+			"config": "chathotkey.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.18.2",
+		"minecraft": "~1.21.10",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

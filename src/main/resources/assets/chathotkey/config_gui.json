@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "content": [
+    {
+      "type": "boolean",
+      "key": "general.PreviewClickEvents.Enabled"
+    },
+    {
+      "type": "boolean",
+      "key": "chatkeybindings.Macro.Enabled"
+    },
+    {
+      "type": "MacroList",
+      "key": "chatkeybindings.Macro.List"
+    }
+  ]
+}
