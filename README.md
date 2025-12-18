@@ -59,8 +59,8 @@ This feature allows you to create shortcuts for commands or messages, expanding 
 2. Click "Command Aliases" to manage your aliases
 3. Click "New Alias" to add an alias
 4. Configure each alias:
-   - **Alias**: The shortcut you type (e.g., `/s` or `/about`)
-   - **Command**: What it expands to (e.g., `/say` or `Hello, my name is Foo Bar`)
+   - **Alias**: The shortcut you type (e.g., `/s` )
+   - **Command**: What it expands to (e.g., `/say`)
    - **Enabled**: Check to activate the alias
 5. Save and exit the config screen
 
