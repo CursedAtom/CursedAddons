@@ -66,7 +66,7 @@ This feature allows you to create shortcuts for commands or messages, expanding 
 
 Examples:
 - `/s hello` → `/say hello` (command expansion)
-- `/about` → `Hello, my name is Foo Bar` (text message)
+- `/about` → `this is a message about something` (text message)
 
 #### Click Events Preview
 This feature shows a preview of what will happen when you click on interactive text in chat.
