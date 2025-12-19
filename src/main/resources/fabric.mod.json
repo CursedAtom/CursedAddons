@@ -1,30 +1,30 @@
 {
 	"schemaVersion": 1,
-	"id": "chathotkey",
+	"id": "cursedaddons",
 	"version": "${version}",
-	"name": "ChatHotkey",
-	"description": "Add Hotkeys to chat messages in Minecraft",
+	"name": "CursedAddons",
+	"description": "Add various enhancements to Minecraft, starting with chat functionality",
 	"authors": [
 		"CursedAtom"
 	],
 	"license": "GPL-3.0",
-	"icon": "assets/chathotkey/icon.png",
+	"icon": "assets/cursedaddons/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"dev.cursedatom.chathotkey.ChatHotkey"
+			"dev.cursedatom.cursedaddons.CursedAddons"
 		],
 		"client": [
-			"dev.cursedatom.chathotkey.ChatHotkeyClient"
+			"dev.cursedatom.cursedaddons.CursedAddonsClient"
 		],
 		"modmenu": [
-			"dev.cursedatom.chathotkey.modmenu.ChatHotkeyModMenuIntegration"
+			"dev.cursedatom.cursedaddons.modmenu.CursedAddonsModMenuIntegration"
 		]
 	},
 	"mixins": [
-		"chathotkey.mixins.json",
+		"cursedaddons.mixins.json",
 		{
-			"config": "chathotkey.client.mixins.json",
+			"config": "cursedaddons.client.mixins.json",
 			"environment": "client"
 		}
 	],

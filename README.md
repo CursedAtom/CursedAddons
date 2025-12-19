@@ -1,7 +1,7 @@
-# ChatHotkey
+# CursedAddons
 
 ## Description
-ChatHotkey is a Minecraft Fabric mod that enhances chat functionality with keybindings, aliases, and preview features, making communication in-game faster and more convenient.
+CursedAddons is a Minecraft Fabric mod that enhances chat functionality with keybindings, aliases, and preview features, making communication in-game faster and more convenient.
 
 ## Features
 *   **Command Keybindings**: Define custom hotkeys and key combinations (e.g., Shift+F1) to instantly send predefined chat messages or commands.
@@ -20,20 +20,20 @@ ChatHotkey is a Minecraft Fabric mod that enhances chat functionality with keybi
 1.  **Install Fabric Loader:** If you haven't already, download and install the Fabric Loader for Minecraft `1.21.10` from the [Fabric website](https://fabricmc.net/use/).
 2.  **Download Fabric API:** Download the Fabric API for `1.21.10` from its [Modrinth page](https://modrinth.com/mod/fabric-api).
 3.  **Download Cloth Config:** Download the Cloth Config API for `1.21.10` from its [Modrinth page](https://modrinth.com/mod/cloth-config).
-3.  **Download ChatHotkey:**
-    *   Go to the [releases page](https://github.com/CursedAtom/ChatHotkey/releases)
+3.  **Download CursedAddons:**
+    *   Go to the [releases page](https://github.com/CursedAtom/CursedAddons/releases)
 4.  **Place Mods in `mods` folder:**
     *   Locate your Minecraft installation directory.
     *   Navigate to the `mods` folder. If it doesn't exist, create one.
-    *   Place the downloaded `fabric-api-*.jar`, `cloth-config*.jar`, and `chathotkey-*.jar` files into the `mods` folder.
+    *   Place the downloaded `fabric-api-*.jar`, `cloth-config*.jar`, and `cursedaddons-*.jar` files into the `mods` folder.
 5.  **Launch Minecraft:** Start the Minecraft launcher, select the Fabric profile, and launch the game.
 
 ## Usage
 
 ### Configuration
-ChatHotkey can be configured through its configuration screen, accessible in two ways:
-- **Via ModMenu**: If you have ModMenu installed, go to Mods → ChatHotkey → Config
-- **Via Command**: Type `/chathotkey` in chat to open the configuration screen
+CursedAddons can be configured through its configuration screen, accessible in two ways:
+- **Via ModMenu**: If you have ModMenu installed, go to Mods → CursedAddons → Config
+- **Via Command**: Type `/cursedaddons` in chat to open the configuration screen
 
 ### Features Configuration
 
@@ -91,8 +91,8 @@ This helps you verify links and commands before clicking them.
 ### Steps
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/CursedAtom/ChatHotkey.git
-    cd ChatHotkey
+    git clone https://github.com/CursedAtom/CursedAddons.git
+    cd CursedAddons
     ```
 2.  **Build the project:**
     ```bash

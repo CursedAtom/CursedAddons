@@ -25,7 +25,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"chathotkey" {
+		"cursedaddons" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}
