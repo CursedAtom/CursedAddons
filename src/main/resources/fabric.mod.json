@@ -22,7 +22,6 @@
 		]
 	},
 	"mixins": [
-		"cursedaddons.mixins.json",
 		{
 			"config": "cursedaddons.client.mixins.json",
 			"environment": "client"
