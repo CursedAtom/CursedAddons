@@ -1,11 +1,11 @@
-## [1.0.0-beta.2] - 2025-12-19
+## [1.0.0-beta.1] - 2025-12-19
 
 ### Added
 ```diff
 + Initial beta release of CursedAddons
 + Chat keybinding macros feature
 + Command aliases functionality
-+ Enhanced chat preview features
++ View onClick action for chat messages
 + ModMenu integration with configuration screen
 ```
 
