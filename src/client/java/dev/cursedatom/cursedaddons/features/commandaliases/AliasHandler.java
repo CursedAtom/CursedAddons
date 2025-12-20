@@ -8,11 +8,6 @@ import java.util.List;
 
 public class AliasHandler {
     public static String processMessage(String message) {
-        // Handle double slash at the beginning (e.g., //bz -> /bz)
-        if (message.startsWith("//")) {
-            message = "/" + message.substring(2);
-        }
-
         if (!message.startsWith("/")) {
             return message;
         }

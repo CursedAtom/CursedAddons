@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screens.Screen;
 public class CursedAddonsClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
+		dev.cursedatom.cursedaddons.features.doublechatfix.DoubleChatFix.init();
 		ConfigUtils.init();
 		CommandRegistry.register();
 		
