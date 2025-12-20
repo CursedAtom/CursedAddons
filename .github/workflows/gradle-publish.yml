@@ -54,7 +54,7 @@ jobs:
       run: |
         {
           echo "body<<EOF"
-          cat CHANGELOG.md
+          awk '/^## / { if (p) { exit }; p=1; print; next } p { print }' CHANGELOG.md
           echo "EOF"
         } >> $GITHUB_OUTPUT
 

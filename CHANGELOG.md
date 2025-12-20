@@ -1,3 +1,14 @@
+## [1.0.0-beta.3] - 2025-12-20
+
+### Added
+```diff
++ Implemented MC-122477 Fix (Double Chat Fix) for Linux systems
+```
+### Changed
+```diff
+- Removed `//` to `/` command alias handling
+```
+
 ## [1.0.0-beta.2] - 2025-12-19
 
 ### Fixed

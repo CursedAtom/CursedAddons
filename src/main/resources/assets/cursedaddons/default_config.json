@@ -1,8 +1,8 @@
 {
   "config.version": 1.0,
-  "chatkeybindings.Macro.Enabled": true,
+  "chatkeybindings.Macro.Enabled": false,
   "chatkeybindings.Macro.List": [],
-  "commandaliases.Aliases.Enabled": true,
+  "commandaliases.Aliases.Enabled": false,
   "commandaliases.Aliases.List": [],
-  "general.PreviewClickEvents.Enabled": true
+  "general.PreviewClickEvents.Enabled": false
 }

@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import dev.cursedatom.cursedaddons.utils.ConfigUtils;
 import dev.cursedatom.cursedaddons.utils.LoggerUtils;
-import net.minecraft.client.Minecraft;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
