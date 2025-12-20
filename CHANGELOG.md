@@ -32,4 +32,4 @@
 + Enhanced chat preview features
 + View onClick action for chat messages
 + ModMenu integration with configuration screen
-```
+``` 
