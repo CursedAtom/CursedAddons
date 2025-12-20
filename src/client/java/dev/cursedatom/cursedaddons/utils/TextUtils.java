@@ -7,7 +7,7 @@ import net.minecraft.network.chat.Style;
 import java.util.List;
 
 public class TextUtils {
-    public static final String PREFIX = "key.chathotkey.";
+    public static final String PREFIX = "key.cursedaddons.";
     public static final Component SPACER = literal("").copy().setStyle(Style.EMPTY);
 
     public static Component literal(String str) {

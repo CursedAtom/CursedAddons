@@ -34,12 +34,12 @@ public class AliasHandler {
         for (SpecialUnits.AliasUnit alias : aliases) {
             if (alias.enabled && !alias.alias.isEmpty() && message.startsWith(alias.alias + " ")) {
                 String replaced = message.replaceFirst(alias.alias, alias.command);
-                LoggerUtils.info("[ChatHotkey] Alias replaced: '" + message + "' -> '" + replaced + "'");
+                LoggerUtils.info("[CursedAddons] Alias replaced: '" + message + "' -> '" + replaced + "'");
                 return replaced;
             } else if (alias.enabled && !alias.alias.isEmpty() && message.equals(alias.alias)) {
                 // Exact match
                 String replaced = alias.command;
-                LoggerUtils.info("[ChatHotkey] Alias replaced: '" + message + "' -> '" + replaced + "'");
+                LoggerUtils.info("[CursedAddons] Alias replaced: '" + message + "' -> '" + replaced + "'");
                 return replaced;
             }
         }

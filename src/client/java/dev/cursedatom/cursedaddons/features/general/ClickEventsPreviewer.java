@@ -127,7 +127,7 @@ public class ClickEventsPreviewer {
                     texts.add(TextUtils.trans("texts.PreviewClickEvents.clickEvent.copyToClipboard", valueComponent));
                     break;
                 default:
-                    LoggerUtils.warn("[ChatHotkey] Unknown clickEvent action type: " + action);
+                    LoggerUtils.warn("[CursedAddons] Unknown clickEvent action type: " + action);
             }
         }
         return TextUtils.textArray2text(texts);

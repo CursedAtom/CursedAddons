@@ -28,7 +28,7 @@ public class Macro {
             if (macro.enabled && KeyboardUtils.isKeyPressingWithModifier(macro.key, macro.modifier)) {
                 if (!keyWasPressed.contains(macro)) {
                     keyWasPressed.add(macro);
-                    LoggerUtils.info("[ChatHotkey] Triggered Macro: " + macro.command);
+                    LoggerUtils.info("[CursedAddons] Triggered Macro: " + macro.command);
                     MessageUtils.sendToPublicChat(macro.command);
                 }
             } else {

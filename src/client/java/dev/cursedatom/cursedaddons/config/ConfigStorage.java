@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class ConfigStorage {
     public static final File FILE = new File(net.fabricmc.loader.api.FabricLoader.getInstance().getConfigDir()
-                                                                                 .toFile(), "chat_hotkey.json");
+                                                                                 .toFile(), "cursedaddons.json");
 
     private Map<String, Object> configMap;
 
@@ -46,8 +46,8 @@ public class ConfigStorage {
         try {
             Reader reader;
             if (loadDefault) {
-                reader = new InputStreamReader(Minecraft.getInstance().getClass().getClassLoader()
-                                                        .getResourceAsStream("assets/chathotkey/default_config.json"));
+                reader = new InputStreamReader(ConfigStorage.class.getClassLoader()
+                                                        .getResourceAsStream("assets/cursedaddons/default_config.json"));
             } else {
                 reader = new InputStreamReader(new FileInputStream(FILE), StandardCharsets.UTF_8);
             }
@@ -63,7 +63,7 @@ public class ConfigStorage {
         } else if (ConfigUtils.DEFAULT_CONFIG != null && ConfigUtils.DEFAULT_CONFIG.hasKey(key)) {
             return ConfigUtils.DEFAULT_CONFIG.get(key);
         } else {
-            LoggerUtils.error("[ChatHotkey] Error occurred when getting variable \"" + key + "\", no such key!");
+            LoggerUtils.error("[CursedAddons] Error occurred when getting variable \"" + key + "\", no such key!");
             return null;
         }
     }
@@ -80,11 +80,11 @@ public class ConfigStorage {
 
     public void save() {
         if (configMap == null) return;
-        LoggerUtils.info("[ChatHotkey] Saving configs.");
+        LoggerUtils.info("[CursedAddons] Saving configs.");
         try (Writer writer = new OutputStreamWriter(new FileOutputStream(FILE), StandardCharsets.UTF_8)) {
             GSON.toJson(configMap, writer);
         } catch (Exception e) {
-            LoggerUtils.error("[ChatHotkey] Couldn't save config.");
+            LoggerUtils.error("[CursedAddons] Couldn't save config.");
             e.printStackTrace();
         }
     }

@@ -27,10 +27,10 @@ public class ConfigScreenGenerator {
 
     public static void loadConfigGuiMap() {
         try {
-            InputStream inputStream = Minecraft.getInstance().getClass().getClassLoader()
-                                                     .getResourceAsStream("assets/chathotkey/config_gui.json");
+            InputStream inputStream = ConfigScreenGenerator.class.getClassLoader()
+                                                     .getResourceAsStream("assets/cursedaddons/config_gui.json");
             if (inputStream == null) {
-                LoggerUtils.error("config_gui.json not found in assets/chathotkey/");
+                LoggerUtils.error("config_gui.json not found in assets/cursedaddons/");
                 return;
             }
             Reader reader = new InputStreamReader(inputStream);
