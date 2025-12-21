@@ -7,6 +7,7 @@ CursedAddons is a Minecraft Fabric mod that enhances chat functionality with key
 *   **Command Keybindings**: Define custom hotkeys and key combinations (e.g., Shift+F1) to instantly send predefined chat messages or commands.
 *   **Command Aliases**: Create shortcuts for frequently used commands or messages (e.g., `/s` → `/say` or `/about` → `Hello, my name is Foo Bar`).
 *   **Click Events Preview**: When hovering over clickable text in chat, preview what actions will occur (opening URLs, running commands, copying to clipboard, etc.) before clicking.
+*   **Fixes MC-122477**: Fixes a bug on Wayland (Linux Desktop Environment) where the key to open commands and/or chat can sometimes be doubled when pressed.
 
 ## Installation
 
