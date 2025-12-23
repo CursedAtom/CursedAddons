@@ -12,8 +12,9 @@ import net.minecraft.client.gui.screens.Screen;
 public class CursedAddonsClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-				ConfigUtils.init();
+		ConfigUtils.init();
 		CommandRegistry.register();
+		dev.cursedatom.cursedaddons.features.doublechatfix.DoubleChatFix.init();
 		
 		ClientTickEvents.START_WORLD_TICK.register(client -> {
 		    Object enabled = ConfigUtils.get("chatkeybindings.Macro.Enabled");
