@@ -5,8 +5,7 @@
 	"client": [
 		"ChatComponentMixin",
 		"ChatScreenMixin",
-		"MixinKeyboard",
-		"MixinMinecraft"
+		"MixinKeyboard"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -3,6 +3,7 @@ package dev.cursedatom.cursedaddons;
 import dev.cursedatom.cursedaddons.command.CommandRegistry;
 import dev.cursedatom.cursedaddons.config.ConfigScreenGenerator;
 import dev.cursedatom.cursedaddons.features.chatkeybindings.Macro;
+import dev.cursedatom.cursedaddons.features.doublechatfix.DoubleChatFix;
 import dev.cursedatom.cursedaddons.utils.ConfigUtils;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -14,6 +15,7 @@ public class CursedAddonsClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		ConfigUtils.init();
 		CommandRegistry.register();
+        DoubleChatFix.init();
 		dev.cursedatom.cursedaddons.features.doublechatfix.DoubleChatFix.init();
 		
 		ClientTickEvents.START_WORLD_TICK.register(client -> {
