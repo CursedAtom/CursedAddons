@@ -82,18 +82,18 @@ public class SpecialUnits {
 
     public static class AliasUnit {
         public String alias;
-        public String command;
+        public String replacement;
         public boolean enabled;
 
         public AliasUnit() {
             this.alias = "";
-            this.command = "";
+            this.replacement = "";
             this.enabled = true;
         }
 
-        public AliasUnit(String alias, String command, boolean enabled) {
+        public AliasUnit(String alias, String replacement, boolean enabled) {
             this.alias = alias;
-            this.command = command;
+            this.replacement = replacement;
             this.enabled = enabled;
         }
 
@@ -102,9 +102,9 @@ public class SpecialUnits {
             if (ele instanceof Map) {
                 Map<String, Object> map = (Map<String, Object>) ele;
                 String alias = (String) map.getOrDefault("alias", "");
-                String command = (String) map.getOrDefault("command", "");
+                String replacement = (String) map.getOrDefault("replacement", "");
                 boolean enabled = (boolean) map.getOrDefault("enabled", true);
-                return new AliasUnit(alias, command, enabled);
+                return new AliasUnit(alias, replacement, enabled);
             } else if (ele instanceof AliasUnit) {
                 return (AliasUnit) ele;
             } else {
@@ -129,17 +129,104 @@ public class SpecialUnits {
                 return false;
             }
             AliasUnit aliasUnit = (AliasUnit) o;
-            return alias.equals(aliasUnit.alias) && command.equals(aliasUnit.command) && enabled == aliasUnit.enabled;
+            return alias.equals(aliasUnit.alias) && replacement.equals(aliasUnit.replacement) && enabled == aliasUnit.enabled;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(alias, command, enabled);
+            return Objects.hash(alias, replacement, enabled);
         }
 
         @Override
         public String toString() {
-            return "AliasUnit{alias='" + alias + "', command='" + command + "', enabled=" + enabled + "}";
+            return "AliasUnit{alias='" + alias + "', replacement='" + replacement + "', enabled=" + enabled + "}";
+        }
+    }
+
+    public static class NotificationUnit {
+        public String pattern;
+        public boolean regex;
+        public String sound;
+        public boolean soundEnabled;
+        public String title;
+        public boolean titleEnabled;
+        public String command;
+        public boolean commandEnabled;
+        public boolean enabled;
+
+        public NotificationUnit() {
+            this.pattern = "";
+            this.regex = false;
+            this.sound = "";
+            this.soundEnabled = false;
+            this.title = "";
+            this.titleEnabled = false;
+            this.command = "";
+            this.commandEnabled = false;
+            this.enabled = true;
+        }
+
+        public NotificationUnit(String pattern, boolean regex, String sound, boolean soundEnabled, String title, boolean titleEnabled, String command, boolean commandEnabled, boolean enabled) {
+            this.pattern = pattern;
+            this.regex = regex;
+            this.sound = sound;
+            this.soundEnabled = soundEnabled;
+            this.title = title;
+            this.titleEnabled = titleEnabled;
+            this.command = command;
+            this.commandEnabled = commandEnabled;
+            this.enabled = enabled;
+        }
+
+        @SuppressWarnings("unchecked")
+        public static NotificationUnit of(Object ele) {
+            if (ele instanceof Map) {
+                Map<String, Object> map = (Map<String, Object>) ele;
+                String pattern = (String) map.getOrDefault("pattern", "");
+                boolean regex = (boolean) map.getOrDefault("regex", false);
+                String sound = (String) map.getOrDefault("sound", "");
+                boolean soundEnabled = (boolean) map.getOrDefault("soundEnabled", false);
+                String title = (String) map.getOrDefault("title", "");
+                boolean titleEnabled = (boolean) map.getOrDefault("titleEnabled", false);
+                String command = (String) map.getOrDefault("command", "");
+                boolean commandEnabled = (boolean) map.getOrDefault("commandEnabled", false);
+                boolean enabled = (boolean) map.getOrDefault("enabled", true);
+                return new NotificationUnit(pattern, regex, sound, soundEnabled, title, titleEnabled, command, commandEnabled, enabled);
+            } else if (ele instanceof NotificationUnit) {
+                return (NotificationUnit) ele;
+            } else {
+                throw new IllegalArgumentException("Unexpected element type of Object: " + ele);
+            }
+        }
+
+        public static List<NotificationUnit> fromList(List<Object> list) {
+            List<NotificationUnit> arr = new ArrayList<>();
+            for (Object ele : list) {
+                arr.add(NotificationUnit.of(ele));
+            }
+            return arr;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            NotificationUnit that = (NotificationUnit) o;
+            return regex == that.regex && soundEnabled == that.soundEnabled && titleEnabled == that.titleEnabled && commandEnabled == that.commandEnabled && enabled == that.enabled && pattern.equals(that.pattern) && sound.equals(that.sound) && title.equals(that.title) && command.equals(that.command);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(pattern, regex, sound, soundEnabled, title, titleEnabled, command, commandEnabled, enabled);
+        }
+
+        @Override
+        public String toString() {
+            return "NotificationUnit{pattern='" + pattern + "', regex=" + regex + ", sound='" + sound + "', soundEnabled=" + soundEnabled + ", title='" + title + "', titleEnabled=" + titleEnabled + ", command='" + command + "', commandEnabled=" + commandEnabled + ", enabled=" + enabled + "}";
         }
     }
 }

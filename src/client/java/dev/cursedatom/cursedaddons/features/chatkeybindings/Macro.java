@@ -3,7 +3,6 @@ package dev.cursedatom.cursedaddons.features.chatkeybindings;
 import dev.cursedatom.cursedaddons.config.SpecialUnits;
 import dev.cursedatom.cursedaddons.utils.ConfigUtils;
 import dev.cursedatom.cursedaddons.utils.KeyboardUtils;
-import dev.cursedatom.cursedaddons.utils.LoggerUtils;
 import dev.cursedatom.cursedaddons.utils.MessageUtils;
 import net.minecraft.client.Minecraft;
 
@@ -28,7 +27,6 @@ public class Macro {
             if (macro.enabled && KeyboardUtils.isKeyPressingWithModifier(macro.key, macro.modifier)) {
                 if (!keyWasPressed.contains(macro)) {
                     keyWasPressed.add(macro);
-                    LoggerUtils.info("[CursedAddons] Triggered Macro: " + macro.command);
                     MessageUtils.sendToPublicChat(macro.command);
                 }
             } else {

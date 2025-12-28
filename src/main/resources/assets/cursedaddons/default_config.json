@@ -4,5 +4,7 @@
   "chatkeybindings.Macro.List": [],
   "commandaliases.Aliases.Enabled": false,
   "commandaliases.Aliases.List": [],
+  "chatnotifications.Notifications.Enabled": false,
+  "chatnotifications.Notifications.List": [],
   "general.PreviewClickEvents.Enabled": false
 }

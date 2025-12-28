@@ -35,6 +35,19 @@
           "key": "commandaliases.Aliases.List"
         }
       ]
+    },
+    {
+      "name": "Chat Notifications",
+      "content": [
+        {
+          "type": "boolean",
+          "key": "chatnotifications.Notifications.Enabled"
+        },
+        {
+          "type": "NotificationList",
+          "key": "chatnotifications.Notifications.List"
+        }
+      ]
     }
   ]
 }

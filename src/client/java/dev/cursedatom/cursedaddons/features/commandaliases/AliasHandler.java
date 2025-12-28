@@ -2,7 +2,6 @@ package dev.cursedatom.cursedaddons.features.commandaliases;
 
 import dev.cursedatom.cursedaddons.config.SpecialUnits;
 import dev.cursedatom.cursedaddons.utils.ConfigUtils;
-import dev.cursedatom.cursedaddons.utils.LoggerUtils;
 
 import java.util.List;
 
@@ -28,13 +27,11 @@ public class AliasHandler {
 
         for (SpecialUnits.AliasUnit alias : aliases) {
             if (alias.enabled && !alias.alias.isEmpty() && message.startsWith(alias.alias + " ")) {
-                String replaced = message.replaceFirst(alias.alias, alias.command);
-                LoggerUtils.info("[CursedAddons] Alias replaced: '" + message + "' -> '" + replaced + "'");
+                String replaced = message.replaceFirst(alias.alias, alias.replacement);
                 return replaced;
             } else if (alias.enabled && !alias.alias.isEmpty() && message.equals(alias.alias)) {
                 // Exact match
-                String replaced = alias.command;
-                LoggerUtils.info("[CursedAddons] Alias replaced: '" + message + "' -> '" + replaced + "'");
+                String replaced = alias.replacement;
                 return replaced;
             }
         }
