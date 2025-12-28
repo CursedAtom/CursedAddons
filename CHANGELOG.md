@@ -1,3 +1,12 @@
+## [1.0.0] - 2025-12-28
+
+### What's New
+```diff
++ Chat notifications feature with regex/string matching, sound playback, title setting, and command execution
++ Fixed ClothConfig [Issue #300](https://github.com/shedaniel/cloth-config/issues/300) with a mixin
++ First release
+```
+
 ## [1.0.0-beta.3] - 2025-12-20
 
 ### Added
@@ -32,4 +41,4 @@
 + Enhanced chat preview features
 + View onClick action for chat messages
 + ModMenu integration with configuration screen
-``` 
+```
