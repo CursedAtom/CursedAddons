@@ -7,6 +7,7 @@ CursedAddons is a Minecraft Fabric mod that enhances chat functionality with key
 *   **Command Keybindings**: Define custom hotkeys and key combinations (e.g., Shift+F1) to instantly send predefined chat messages or commands.
 *   **Command Aliases**: Create shortcuts for frequently used commands or messages (e.g., `/s` → `/say` or `/about` → `Hello, my name is Foo Bar`).
 *   **Click Events Preview**: When hovering over clickable text in chat, preview what actions will occur (opening URLs, running commands, copying to clipboard, etc.) before clicking.
+*   **Chat Notifications**: Set up custom notifications for specific chat messages using string matching or regex patterns. Notifications can play sounds, set window titles, or execute commands when triggered.
 *   **Fixes MC-122477**: Fixes a bug on Wayland (Linux Desktop Environment) where the key to open commands and/or chat can sometimes be doubled when pressed.
 
 ## Installation
@@ -80,6 +81,26 @@ This feature shows a preview of what will happen when you click on interactive t
 3. Hold Shift while hovering to see insertion text (what gets inserted into chat)
 
 This helps you verify links and commands before clicking them.
+
+#### Chat Notifications
+This feature allows you to set up automatic notifications for specific chat messages using string matching or regex patterns.
+
+1. In the config screen, ensure "Enable Chat Notifications" is checked
+2. Click "Chat Notifications" to manage your notification rules
+3. Click "New Notification" to add a rule
+4. Configure each notification:
+   - **Pattern**: The text or regex pattern to match in chat messages
+   - **Use Regex**: Check if the pattern should be treated as a regular expression
+   - **Play Sound**: Check to play a sound when matched, and enter the sound resource location
+   - **Set Title**: Check to set the window title when matched, and enter the title text
+   - **Send Command**: Check to send a command when matched, and enter the command to send
+   - **Enabled**: Check to activate the notification
+5. Save and exit the config screen
+
+Examples:
+- Match "Welcome" and play a notification sound
+- Use regex like "Player (.+) joined" to capture player names and set title to "Player $1 joined!"
+- Send "/tell $1 Welcome!" when someone joins
 
 
 ## Building from Source
