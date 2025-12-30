@@ -5,7 +5,7 @@ CursedAddons is a Minecraft Fabric mod that enhances chat functionality with key
 
 ## Features
 *   **Command Keybindings**: Define custom hotkeys and key combinations (e.g., Shift+F1) to instantly send predefined chat messages or commands.
-*   **Command Aliases**: Create shortcuts for frequently used commands or messages (e.g., `/s` → `/say` or `/about` → `Hello, my name is Foo Bar`).
+*   **Command Aliases**: Create shortcuts for frequently used commands or messages (e.g., `/s` → `/say` or `/about` → `Hello, my name is John Smith`).
 *   **Click Events Preview**: When hovering over clickable text in chat, preview what actions will occur (opening URLs, running commands, copying to clipboard, etc.) before clicking.
 *   **Chat Notifications**: Set up custom notifications for specific chat messages using string matching or regex patterns. Notifications can play sounds, set window titles, or execute commands when triggered.
 *   **Fixes MC-122477**: Fixes a bug on Unix systems where the key to open commands and/or chat can sometimes be doubled when pressed.
@@ -21,8 +21,7 @@ CursedAddons is a Minecraft Fabric mod that enhances chat functionality with key
 1.  **Install Fabric Loader:** If you haven't already, download and install the Fabric Loader for Minecraft `1.21.10` from the [Fabric website](https://fabricmc.net/use/).
 2.  **Download Fabric API:** Download the Fabric API for `1.21.10` from its [Modrinth page](https://modrinth.com/mod/fabric-api).
 3.  **Download Cloth Config:** Download the Cloth Config API for `1.21.10` from its [Modrinth page](https://modrinth.com/mod/cloth-config).
-3.  **Download CursedAddons:**
-    *   Go to the [releases page](https://github.com/CursedAtom/CursedAddons/releases)
+3.  **Download CursedAddons**
 4.  **Place Mods in `mods` folder:**
     *   Locate your Minecraft installation directory.
     *   Navigate to the `mods` folder. If it doesn't exist, create one.
@@ -45,7 +44,7 @@ This feature allows you to create macros that send chat messages or commands whe
 2. Click "Command Keybindings" to manage your macros
 3. Click "New Rule" to add a macro
 4. Configure each macro:
-   - **Key**: Choose the main key (e.g., F1, F2, etc.)
+   - **Key**: Choose the main key (e.g., F1, F2, Numpad 0, X, etc.)
    - **Combination Key**: Select a modifier (Shift, Ctrl, Alt) or "NONE" for single key press
    - **Command**: Enter the chat message or command to send (e.g., "/say Hello World!" or "Hello everyone!")
    - **Enabled**: Check to activate the macro
@@ -78,7 +77,6 @@ This feature shows a preview of what will happen when you click on interactive t
    - Commands that will run
    - Text that will be suggested or copied
    - Other interactive actions
-3. Hold Shift while hovering to see insertion text (what gets inserted into chat)
 
 This helps you verify links and commands before clicking them.
 
@@ -104,7 +102,6 @@ This feature allows you to set up automatic notifications for specific chat mess
 
 **Examples:**
 - Match "Welcome" and play a notification sound
-- Use regex like `&6([^ ]+) was banned` to capture gold-colored banned player names
 - Use regex like `Player (.+) joined` to capture player names and set title to `Player $1 joined!`
 - Send `/tell $1 Welcome! You earned \$100!` when someone joins (literal $ in message)
 - Use regex like "&6([^ ]+) was banned" to capture something like "§6Player123 was banned"
@@ -115,6 +112,15 @@ For debugging ChatNotifications regex patterns, you can use the [regex tester](h
 - See capture groups in the same format used by the mod ($0, $1, etc.)
 - Preview how color codes will appear visually
 - Convert & color codes to § automatically (like the mod does)
+
+## Contributing
+Contributions are welcome! If you have suggestions, bug reports, or want to contribute code, please feel free to open an issue or pull request!
+
+## License
+This project is licensed under the GNU General Public License v3.0. See the `LICENSE` file for more details.
+
+#### Big shout out to 70CentsApple for the [original concept](https://github.com/70CentsApple/ChatTools)!
+
 
 ## Building from Source
 
