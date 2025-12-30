@@ -1,7 +1,7 @@
 # CursedAddons
 
 ## Description
-CursedAddons is a Minecraft Fabric mod that enhances chat functionality with keybindings, aliases, and preview features, making communication in-game faster and more convenient.
+CursedAddons is a Minecraft Fabric mod that enhances chat functionality with keybindings, aliases, chat notifiers, and the ability to view onClick actions for rich messages.
 
 ## Features
 *   **Command Keybindings**: Define custom hotkeys and key combinations (e.g., Shift+F1) to instantly send predefined chat messages or commands.
