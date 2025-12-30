@@ -10,17 +10,29 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 
+/**
+ * Main client-side initializer for CursedAddons mod.
+ * Handles initialization of all client-side features and event registration.
+ */
 public class CursedAddonsClient implements ClientModInitializer {
+	private static boolean macroEnabled = false;
+
+	private static void updateCachedConfig() {
+		Object enabled = ConfigUtils.get("chatkeybindings.Macro.Enabled");
+		macroEnabled = enabled != null && (boolean) enabled;
+	}
+
 	@Override
 	public void onInitializeClient() {
 		ConfigUtils.init();
 		CommandRegistry.register();
         DoubleChatFix.init();
-		dev.cursedatom.cursedaddons.features.doublechatfix.DoubleChatFix.init();
-		
+
+        // Cache initial config state
+        updateCachedConfig();
+
 		ClientTickEvents.START_WORLD_TICK.register(client -> {
-		    Object enabled = ConfigUtils.get("chatkeybindings.Macro.Enabled");
-            if (enabled != null && (boolean) enabled) {
+            if (macroEnabled) {
                 Macro.tick();
             }
         });

@@ -16,8 +16,7 @@ public abstract class MultiElementListEntryMixin<T> {
     private MultiElementListEntry<T>.CategoryLabelWidget widget;
 
     /**
-     * @author cursedatom
-     * @reason Propagate mouse events to label widget (necessary for label click to toggle expand/collapse)
+     * Propagate mouse events to label widget (necessary for label click to toggle expand/collapse). Fixes ClothConfig issue #300 (https://github.com/shedaniel/cloth-config/issues/300)
      */
     @Inject(method = "mouseClicked", at = @At("RETURN"), cancellable = true, remap = false)
     private void propagateMouseEvents(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick, CallbackInfoReturnable<Boolean> cir) {

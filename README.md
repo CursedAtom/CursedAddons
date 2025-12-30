@@ -97,11 +97,24 @@ This feature allows you to set up automatic notifications for specific chat mess
    - **Enabled**: Check to activate the notification
 5. Save and exit the config screen
 
-Examples:
-- Match "Welcome" and play a notification sound
-- Use regex like "Player (.+) joined" to capture player names and set title to "Player $1 joined!"
-- Send "/tell $1 Welcome!" when someone joins
+**Escape Sequences:**
+- `\&` - Literal ampersand (&) in patterns and replacement text
+- `\$` - Literal dollar sign ($) in replacement text (commands, titles, sounds)
+- `&` followed by color codes (0-9,a-f,k-o,r) - Minecraft color formatting in patterns
 
+**Examples:**
+- Match "Welcome" and play a notification sound
+- Use regex like `&6([^ ]+) was banned` to capture gold-colored banned player names
+- Use regex like `Player (.+) joined` to capture player names and set title to `Player $1 joined!`
+- Send `/tell $1 Welcome! You earned \$100!` when someone joins (literal $ in message)
+- Use regex like "&6([^ ]+) was banned" to capture something like "§6Player123 was banned"
+
+### Regex Tester
+For debugging ChatNotifications regex patterns, you can use the [regex tester](regex-tester/index.html). This tool allows you to:
+- Test regex patterns against Minecraft chat messages with § color codes
+- See capture groups in the same format used by the mod ($0, $1, etc.)
+- Preview how color codes will appear visually
+- Convert & color codes to § automatically (like the mod does)
 
 ## Building from Source
 

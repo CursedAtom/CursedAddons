@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CursedAddons Regex Tester</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Regex Tester</h1>
+            <p>Test your regex patterns against Minecraft chat messages (with § color code functionality)</p>
+        </header>
+
+        <main>
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="regex-input">Regex Pattern:</label>
+                    <textarea id="regex-input" placeholder="Enter your regex pattern (use & for color codes, they'll be converted to §)"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label for="text-input">Test Text:</label>
+                    <textarea id="text-input" placeholder="Paste your chat message with § color codes"></textarea>
+                </div>
+
+                <button id="test-btn">Test Regex</button>
+            </div>
+
+            <div class="results-section">
+                <div class="result-group">
+                    <h3>Match Result:</h3>
+                    <div id="match-result" class="result-box">No test performed yet</div>
+                </div>
+
+                <div class="result-group">
+                    <h3>Capture Groups:</h3>
+                    <div id="capture-groups" class="result-box">No matches found</div>
+                </div>
+
+                <div class="result-group">
+                    <h3>Visual Preview:</h3>
+                    <div id="visual-preview" class="result-box">Enter text to see color preview</div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Supports capture groups ($0, $1, $2, etc.) like in ChatNotifications</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -22,7 +22,7 @@ public class DoubleChatFix {
 
             if (client.options.keyChat.matches(keyEvent) ||
                 client.options.keyCommand.matches(keyEvent) ||
-                client.options.keyInventory.matches(keyEvent)) {  // Optional: fixes creative search bar too
+                client.options.keyInventory.matches(keyEvent)) { // this one is for the creative search bar
                 cancelNextChar = true;
             }
 

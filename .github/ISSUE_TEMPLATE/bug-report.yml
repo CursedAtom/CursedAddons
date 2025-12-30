@@ -1,0 +1,101 @@
+name: Bug Report
+description: Report a bug or issue with CursedAddons
+title: "[Bug] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug! Please provide as much detail as possible to help us reproduce and fix the issue.
+
+  - type: input
+    id: minecraft-version
+    attributes:
+      label: Minecraft Version
+      description: What version of Minecraft are you using?
+      placeholder: "1.21.10"
+    validations:
+      required: true
+
+  - type: input
+    id: fabric-version
+    attributes:
+      label: Fabric Version
+      description: What version of Fabric Loader are you using?
+      placeholder: "0.18.2"
+    validations:
+      required: true
+
+  - type: input
+    id: mod-version
+    attributes:
+      label: CursedAddons Version
+      description: What version of CursedAddons are you using?
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Where did this bug occur?
+      options:
+        - Single Player
+        - Multiplayer Server
+        - Both
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: What happened? Please be as detailed as possible.
+      placeholder: "Describe what you were doing when the bug occurred..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What should have happened?
+      placeholder: "What did you expect to happen?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this bug?
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any additional context, screenshots, or log files?
+      placeholder: |
+        - Other mods installed
+        - Operating system
+        - Java version
+        - Crash logs or error messages
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please verify these before submitting
+      options:
+        - label: I have checked for duplicate issues
+          required: true
+        - label: I have tested with only CursedAddons and required dependencies
+          required: true
+        - label: I have included all relevant information

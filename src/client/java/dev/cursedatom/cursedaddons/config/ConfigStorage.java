@@ -52,7 +52,8 @@ public class ConfigStorage {
             }
             configMap = GSON.fromJson(reader, new TypeToken<Map<String, Object>>(){}.getType());
         } catch (Exception e) {
-            e.printStackTrace();
+            LoggerUtils.error("[CursedAddons] Failed to load config file: " + e.getMessage());
+            configMap = null;
         }
     }
 
@@ -79,12 +80,10 @@ public class ConfigStorage {
 
     public void save() {
         if (configMap == null) return;
-        LoggerUtils.info("[CursedAddons] Saving configs.");
         try (Writer writer = new OutputStreamWriter(new FileOutputStream(FILE), StandardCharsets.UTF_8)) {
             GSON.toJson(configMap, writer);
         } catch (Exception e) {
-            LoggerUtils.error("[CursedAddons] Couldn't save config.");
-            e.printStackTrace();
+            LoggerUtils.error("[CursedAddons] Couldn't save config: " + e.getMessage());
         }
     }
 }

@@ -1,3 +1,18 @@
+## [1.0.1] - 2025-12-30
+
+### What's New
+```diff
++ Enhanced ChatNotifications with intelligent text matching:
+  - Auto-detects plain text vs legacy text (color codes) based on unescaped & characters in regex patterns
+  - Added \$ escape sequences for literal dollar signs in replacement text
++ New web-based regex tester tool (regex-tester/index.html):
+  - Test patterns against Minecraft chat messages with § color codes
+  - Visual color code preview
+  - Capture group display with replacement simulation
+  - Handles all escape sequences like the mod
++ Updated README with escape sequence guide
+```
+
 ## [1.0.0] - 2025-12-28
 
 ### What's New

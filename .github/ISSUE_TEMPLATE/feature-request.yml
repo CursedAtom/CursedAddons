@@ -1,0 +1,87 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for CursedAddons
+title: "[Feature] "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a feature! Please provide as much detail as possible about your idea.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature Summary
+      description: Briefly describe the feature you'd like to see
+      placeholder: "A short description of the proposed feature..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem/Use Case
+      description: What problem would this feature solve? What's your use case?
+      placeholder: "Describe the problem this feature would address..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: How would you like this feature to work?
+      placeholder: "Describe how you envision this feature working..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: Have you considered any alternative approaches?
+      placeholder: "List any alternative solutions you've considered..."
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Implementation Complexity
+      description: How complex do you think this feature would be to implement?
+      options:
+        - Simple (small changes, low risk)
+        - Medium (moderate changes, some risk)
+        - Complex (major changes, high risk)
+        - Unknown
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How important is this feature to you?
+      options:
+        - Nice to have
+        - Would be helpful
+        - Important for my use case
+        - Critical/blocking my usage
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any additional information, mockups, or examples?
+      placeholder: |
+        - Screenshots or mockups
+        - Similar features in other mods
+        - Technical details or constraints
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please verify these before submitting
+      options:
+        - label: I have checked for duplicate feature requests
+          required: true
+        - label: This feature is within the scope of CursedAddons (chat enhancements)
+          required: true
+        - label: I understand this is a suggestion and implementation is not guaranteed

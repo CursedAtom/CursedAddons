@@ -169,7 +169,7 @@ public class ConfigScreenUtils {
                             .setTooltip(getTooltip(key + ".SoundEnabled", "boolean", unit.soundEnabled))
                             .setDefaultValue(defaultObj.soundEnabled).setSaveConsumer(v -> unit.soundEnabled = v).build());
 
-                    entries.add(eb.startTextDescription(Component.literal("Full sound list: https://minecraft.wiki/w/Sounds")).build());
+                    entries.add(eb.startTextDescription(Component.literal("Full sound list: https://minecraft.wiki/w/Sounds.json (expand \'Sound events\')")).build());
 
                     entries.add(eb.startStrField(trans(key + ".Sound"), unit.sound)
                             .setDefaultValue(defaultObj.sound)
