@@ -110,7 +110,7 @@ This feature allows you to set up automatic notifications for specific chat mess
 - Use regex like "&6([^ ]+) was banned" to capture something like "§6Player123 was banned"
 
 ### Regex Tester
-For debugging ChatNotifications regex patterns, you can use the [regex tester](https://cursedatom.github.io/cursedaddons/regex-tester/). This tool allows you to:
+For debugging ChatNotifications regex patterns, you can use the [regex tester](https://cursedatom.github.io/CursedAddons/docs/regex-tester/). This tool allows you to:
 - Test regex patterns against Minecraft chat messages with § color codes
 - See capture groups in the same format used by the mod ($0, $1, etc.)
 - Preview how color codes will appear visually
