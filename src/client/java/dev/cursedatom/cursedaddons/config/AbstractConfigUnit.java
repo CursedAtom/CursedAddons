@@ -1,0 +1,137 @@
+package dev.cursedatom.cursedaddons.config;
+
+import java.lang.reflect.Field;
+import java.util.*;
+
+public abstract class AbstractConfigUnit {
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static <T extends AbstractConfigUnit> T of(Object ele, Class<T> clazz) {
+        if (ele instanceof Map) {
+            Map<String, Object> map = (Map<String, Object>) ele;
+            try {
+                T instance = clazz.getDeclaredConstructor().newInstance();
+                for (Field field : clazz.getDeclaredFields()) {
+                    if (!field.canAccess(instance)) {
+                        field.setAccessible(true);
+                    }
+                    String fieldName = field.getName();
+                    Object value = map.getOrDefault(fieldName, getDefaultValue(field));
+                    if (value != null) {
+                        if (field.getType().isEnum() && value instanceof String) {
+                            // Handle enum deserialization
+                            Enum<?> enumValue = (Enum<?>) Enum.valueOf((Class<? extends Enum>) field.getType(), (String) value);
+                            field.set(instance, enumValue);
+                        } else {
+                            field.set(instance, value);
+                        }
+                    }
+                }
+                return instance;
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to deserialize " + clazz.getSimpleName(), e);
+            }
+        } else if (clazz.isInstance(ele)) {
+            return (T) ele;
+        } else {
+            throw new IllegalArgumentException("Unexpected element type of Object: " + ele);
+        }
+    }
+
+    public static <T extends AbstractConfigUnit> List<T> fromList(List<Object> list, Class<T> clazz) {
+        List<T> arr = new ArrayList<>();
+        for (Object ele : list) {
+            arr.add(of(ele, clazz));
+        }
+        return arr;
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        for (Field field : this.getClass().getDeclaredFields()) {
+            if (!field.canAccess(this)) {
+                field.setAccessible(true);
+            }
+            try {
+                Object value = field.get(this);
+                if (value != null && field.getType().isEnum()) {
+                    map.put(field.getName(), ((Enum<?>) value).name());
+                } else {
+                    map.put(field.getName(), value);
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to serialize field " + field.getName(), e);
+            }
+        }
+        return map;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        try {
+            for (Field field : getClass().getDeclaredFields()) {
+                if (!field.canAccess(this)) {
+                    field.setAccessible(true);
+                }
+                Object thisValue = field.get(this);
+                Object otherValue = field.get(o);
+                if (!Objects.equals(thisValue, otherValue)) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Failed to compare objects", e);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        List<Object> values = new ArrayList<>();
+        try {
+            for (Field field : getClass().getDeclaredFields()) {
+                if (!field.canAccess(this)) {
+                    field.setAccessible(true);
+                }
+                values.add(field.get(this));
+            }
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Failed to compute hashCode", e);
+        }
+        return Objects.hash(values.toArray());
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName()).append("{");
+        try {
+            boolean first = true;
+            for (Field field : getClass().getDeclaredFields()) {
+                if (!field.canAccess(this)) {
+                    field.setAccessible(true);
+                }
+                if (!first) sb.append(", ");
+                sb.append(field.getName()).append("='").append(field.get(this)).append("'");
+                first = false;
+            }
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Failed to generate toString", e);
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+
+    private static Object getDefaultValue(Field field) {
+        Class<?> type = field.getType();
+        if (type == boolean.class) return false;
+        if (type == int.class) return 0;
+        if (type == long.class) return 0L;
+        if (type == double.class) return 0.0;
+        if (type == float.class) return 0.0f;
+        if (type == String.class) return "";
+        return null;
+    }
+}

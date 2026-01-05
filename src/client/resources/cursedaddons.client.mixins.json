@@ -1,13 +1,12 @@
 {
 	"required": true,
 	"package": "dev.cursedatom.cursedaddons.mixin.client",
-	"compatibilityLevel": "JAVA_21",
+	"compatibilityLevel": "JAVA_25",
 	"client": [
-		"ChatComponentMixin",
+		"GuiGraphicsRenderingTextCollectorMixin",
 		"ChatScreenMixin",
 		"ClientPacketListenerMixin",
-		"MixinKeyboard",
-		"MultiElementListEntryMixin"
+		"MixinKeyboard"
 	],
 	"injectors": {
 		"defaultRequire": 1

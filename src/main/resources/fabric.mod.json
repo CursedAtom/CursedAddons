@@ -16,23 +16,20 @@
 		],
 		"client": [
 			"dev.cursedatom.cursedaddons.CursedAddonsClient"
-		],
-		"modmenu": [
-			"dev.cursedatom.cursedaddons.modmenu.CursedAddonsModMenuIntegration"
 		]
 	},
 	"mixins": [
+		"cursedaddons.mixins.json",
 		{
 			"config": "cursedaddons.client.mixins.json",
 			"environment": "client"
 		}
 	],
 	"depends": {
-		"fabricloader": ">=0.18.2",
-		"minecraft": "~1.21.10",
-		"java": ">=21",
-		"fabric-api": "*",
-		"cloth-config": ">=11.1.118"
+		"fabricloader": ">=0.18.4",
+		"minecraft": "~26.1-",
+		"java": ">=25",
+		"fabric-api": "*"
 	},
 	"suggests": {
 		"another-mod": "*"

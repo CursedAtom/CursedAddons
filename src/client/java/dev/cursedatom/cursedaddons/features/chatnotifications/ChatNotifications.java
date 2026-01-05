@@ -8,7 +8,7 @@ import dev.cursedatom.cursedaddons.utils.TextUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 
 import java.util.List;
@@ -87,7 +87,7 @@ public class ChatNotifications {
                         if (matcher != null && notification.regex) {
                             soundToPlay = replaceCaptureGroups(soundToPlay, matcher);
                         }
-                        ResourceLocation soundLocation = ResourceLocation.parse(soundToPlay);
+                        Identifier soundLocation = Identifier.tryParse(soundToPlay);
                         SoundEvent soundEvent = SoundEvent.createVariableRangeEvent(soundLocation);
                         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(soundEvent, 1.0F));
                     } catch (Exception e) {
