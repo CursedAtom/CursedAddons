@@ -22,11 +22,11 @@ public class MessageUtils {
 
         String text2 = text.trim();
         if (!text2.isEmpty()) {
-            // Rate limiting for commands (50ms minimum interval)
+            // Rate limiting for commands (50ms minimum interval to prevent multiple triggers from happening in the same tick, helps prevent server bans)
             long currentTime = System.currentTimeMillis();
             if (text2.startsWith("/") && currentTime - lastCommandTime < COMMAND_RATE_LIMIT_MS) {
                 LoggerUtils.warn("Command \"" + text2 + "\" not executed due to ratelimit! (" + (currentTime-lastCommandTime)+"/50ms)");
-                return; // Skip command if rate limited
+                return;
 
             }
 

@@ -4,7 +4,7 @@ import dev.cursedatom.cursedaddons.CursedAddons;
 
 public class LoggerUtils {
     public static void init() {
-        // No-op as CursedAddons initializes it
+        // Initialized in the main mod class
     }
 
     public static void info(String s) {

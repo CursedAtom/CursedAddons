@@ -1,5 +1,6 @@
 package dev.cursedatom.cursedaddons.config;
 
+import dev.cursedatom.cursedaddons.config.utils.AbstractConfigUnit;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import java.util.List;

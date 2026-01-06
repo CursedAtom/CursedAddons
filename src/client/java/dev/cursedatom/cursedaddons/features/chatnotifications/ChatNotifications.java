@@ -20,15 +20,12 @@ public class ChatNotifications {
     private static String replaceCaptureGroups(String template, Matcher matcher) {
         String result = template;
 
-        // First, replace escaped dollars with placeholders to avoid conflicts
         result = result.replace("\\$", "{{ESCAPED_DOLLAR}}");
 
-        // Then replace $0, $1, $2, etc. with capture groups
         for (int i = 0; i <= matcher.groupCount(); i++) {
             result = result.replace("$" + i, matcher.group(i));
         }
 
-        // Finally, restore escaped dollars
         result = result.replace("{{ESCAPED_DOLLAR}}", "$");
 
         return result;
@@ -80,7 +77,6 @@ public class ChatNotifications {
 
             if (matches) {
 
-                // Play sound
                 if (notification.soundEnabled && !notification.sound.isEmpty()) {
                     try {
                         String soundToPlay = notification.sound;
@@ -95,7 +91,6 @@ public class ChatNotifications {
                     }
                 }
 
-                // Set title
                 if (notification.titleEnabled && !notification.title.isEmpty()) {
                     String titleToSet = notification.title;
                     if (matcher != null && notification.regex) {
@@ -105,7 +100,6 @@ public class ChatNotifications {
                     Minecraft.getInstance().gui.setTitle(Component.literal(titleToSet));
                 }
 
-                // Send command/message
                 if (notification.commandEnabled && !notification.command.isEmpty()) {
                     String commandToSend = notification.command;
                     if (matcher != null && notification.regex) {

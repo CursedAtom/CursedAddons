@@ -1,4 +1,4 @@
-package dev.cursedatom.cursedaddons.config;
+package dev.cursedatom.cursedaddons.config.utils;
 
 import dev.cursedatom.cursedaddons.utils.ConfigUtils;
 import net.minecraft.client.Minecraft;
@@ -51,7 +51,6 @@ public class ListManager<T extends AbstractConfigUnit> {
             try {
                 items = (List<T>) AbstractConfigUnit.fromList((List<Object>) listObj, (Class<T>) unitClass);
             } catch (Exception e) {
-                // Handle conversion errors gracefully
                 items = new ArrayList<>();
             }
         }
@@ -109,7 +108,6 @@ public class ListManager<T extends AbstractConfigUnit> {
         int spacing = 10;
         int screenCenterX = minecraft.getWindow().getGuiScaledWidth() / 2;
 
-        // Edit button
         Button editButton = Button.builder(Component.literal("Edit"), button -> {
             if (selectedIndex >= 0 && selectedIndex < items.size()) {
                 onEdit.accept(items.get(selectedIndex));
@@ -117,7 +115,6 @@ public class ListManager<T extends AbstractConfigUnit> {
         }).bounds(screenCenterX - actionButtonWidth/2, startY, actionButtonWidth, buttonHeight).build();
         widgets.add(editButton);
 
-        // Delete button
         Button deleteButton = Button.builder(Component.literal("Delete"), button -> {
             if (selectedIndex >= 0 && selectedIndex < items.size()) {
                 removeItem(selectedIndex);
@@ -127,13 +124,11 @@ public class ListManager<T extends AbstractConfigUnit> {
         }).bounds(screenCenterX - actionButtonWidth/2 - actionButtonWidth - spacing, startY, actionButtonWidth, buttonHeight).build();
         widgets.add(deleteButton);
 
-        // Add button
         Button addButton = Button.builder(Component.literal("Add"), button -> {
             onEdit.accept(null);
         }).bounds(screenCenterX - actionButtonWidth/2 + actionButtonWidth + spacing, startY, actionButtonWidth, buttonHeight).build();
         widgets.add(addButton);
 
-        // Display items
         int y = startY + 40;
         for (int i = 0; i < items.size(); i++) {
             final int index = i;
@@ -153,11 +148,10 @@ public class ListManager<T extends AbstractConfigUnit> {
             Button button = buttonBuilder.build();
 
             if (i == selectedIndex) {
-                button.setMessage(Component.literal("> " + displayText + " <"));
+                button.setMessage(Component.literal("§6§l>§r " + displayText + " §6§l<§r"));
             }
             widgets.add(button);
 
-            // Toggle button for enabled state
             Button toggleButton = createToggleButton(item, index, centerX + 235, y, buttonHeight, refreshScreen);
             if (toggleButton != null) {
                 widgets.add(toggleButton);
@@ -175,7 +169,6 @@ public class ListManager<T extends AbstractConfigUnit> {
         int spacing = 10;
         int screenCenterX = minecraft.getWindow().getGuiScaledWidth() / 2;
 
-        // Edit button
         Button editButton = Button.builder(Component.literal("Edit"), button -> {
             if (selectedIndex >= 0 && selectedIndex < items.size()) {
                 onEdit.accept(items.get(selectedIndex));
@@ -183,7 +176,6 @@ public class ListManager<T extends AbstractConfigUnit> {
         }).bounds(screenCenterX - actionButtonWidth/2, startY, actionButtonWidth, buttonHeight).build();
         widgets.add(editButton);
 
-        // Delete button
         Button deleteButton = Button.builder(Component.literal("Delete"), button -> {
             if (selectedIndex >= 0 && selectedIndex < items.size()) {
                 removeItem(selectedIndex);
@@ -193,7 +185,6 @@ public class ListManager<T extends AbstractConfigUnit> {
         }).bounds(screenCenterX - actionButtonWidth/2 - actionButtonWidth - spacing, startY, actionButtonWidth, buttonHeight).build();
         widgets.add(deleteButton);
 
-        // Add button
         Button addButton = Button.builder(Component.literal("Add"), button -> {
             onEdit.accept(null);
         }).bounds(screenCenterX - actionButtonWidth/2 + actionButtonWidth + spacing, startY, actionButtonWidth, buttonHeight).build();
@@ -220,7 +211,6 @@ public class ListManager<T extends AbstractConfigUnit> {
                 refreshScreen.run();
             });
 
-            // Main display button
             Button displayButton = Button.builder(Component.literal(displayText), b -> {
                 selectedIndex = index;
                 refreshScreen.run();
@@ -231,12 +221,11 @@ public class ListManager<T extends AbstractConfigUnit> {
             }
 
             if (index == selectedIndex) {
-                displayButton.setMessage(Component.literal("> " + displayText + " <"));
+                displayButton.setMessage(Component.literal("§6§l>§r " + displayText + " §6§l<§r"));
             }
 
             entry.addButton(displayButton);
 
-            // Toggle button for enabled state
             Button toggleButton = createToggleButton(item, index, buttonWidth + 60, 0, buttonHeight, refreshScreen);
             if (toggleButton != null) {
                 entry.addButton(toggleButton);
@@ -290,13 +279,13 @@ public class ListManager<T extends AbstractConfigUnit> {
     // Scrollable list classes
     public static class ConfigList extends ContainerObjectSelectionList<ListManager.ConfigEntry> {
         public ConfigList(Minecraft mc, int width, int height, int y) {
-            super(mc, width, height, y, 25); // 25px per entry
+            super(mc, width, height, y, 25);
             this.centerListVertically = false;
         }
 
         @Override
         public int getRowWidth() {
-            return 320; // Wide enough for buttons + scrollbar space
+            return 320;
         }
 
         @Override
@@ -331,16 +320,13 @@ public class ListManager<T extends AbstractConfigUnit> {
             // Position buttons relative to this entry
             int buttonY = this.getContentY();
             int displayButtonX = this.getContentX();
-            int toggleButtonX = this.getContentX() + 260; // Position toggle button to the right
+            int toggleButtonX = this.getContentX() + 260;
 
-            // Position and render buttons
             if (!this.children.isEmpty()) {
-                // Main display button
                 Button displayButton = (Button) this.children.get(0);
                 displayButton.setPosition(displayButtonX, buttonY);
                 displayButton.render(graphics, mouseX, mouseY, delta);
 
-                // Toggle button
                 if (this.children.size() > 1) {
                     Button toggleButton = (Button) this.children.get(1);
                     toggleButton.setPosition(toggleButtonX, buttonY);

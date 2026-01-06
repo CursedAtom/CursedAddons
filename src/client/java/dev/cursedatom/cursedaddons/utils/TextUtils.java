@@ -10,7 +10,7 @@ import net.minecraft.util.FormattedCharSink;
 import java.util.List;
 
 public class TextUtils {
-    public static final String PREFIX = "key.cursedaddons.";
+    public static final String PREFIX = "cursedaddons.";
     public static final Component SPACER = literal("");
 
     public static Component literal(String str) {
@@ -60,9 +60,7 @@ public class TextUtils {
 
             @Override
             public boolean accept(int index, Style style, int codePoint) {
-                // Handle style changes
                 if (!style.equals(lastStyle)) {
-                    // Color
                     if (style.getColor() != null && (lastStyle.getColor() == null || !style.getColor().equals(lastStyle.getColor()))) {
                         String colorCode = style.getColor().serialize();
                         ChatFormatting formatting = ChatFormatting.getByName(colorCode);
@@ -70,30 +68,22 @@ public class TextUtils {
                             sb.append('§').append(formatting.getChar());
                         }
                     }
-                    // Bold
                     if (style.isBold() && !lastStyle.isBold()) {
                         sb.append('§').append(ChatFormatting.BOLD.getChar());
                     }
-                    // Italic
                     if (style.isItalic() && !lastStyle.isItalic()) {
                         sb.append('§').append(ChatFormatting.ITALIC.getChar());
                     }
-                    // Underlined
                     if (style.isUnderlined() && !lastStyle.isUnderlined()) {
                         sb.append('§').append(ChatFormatting.UNDERLINE.getChar());
                     }
-                    // Strikethrough
                     if (style.isStrikethrough() && !lastStyle.isStrikethrough()) {
                         sb.append('§').append(ChatFormatting.STRIKETHROUGH.getChar());
                     }
-                    // Obfuscated
                     if (style.isObfuscated() && !lastStyle.isObfuscated()) {
                         sb.append('§').append(ChatFormatting.OBFUSCATED.getChar());
                     }
                     
-
-                    
-
                     lastStyle = style;
                 }
                 sb.append((char) codePoint);

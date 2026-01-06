@@ -38,7 +38,7 @@ public class CommandRegistry {
                 shouldOpenConfigScreen = true;
             } catch (Exception e) {
                 LoggerUtils.error("Failed to open CursedAddons config GUI: " + e.getMessage());
-                MessageUtils.sendToNonPublicChat(TextUtils.trans("text.cursedaddons.error.gui_open_failed", e.getMessage()));
+                MessageUtils.sendToNonPublicChat(TextUtils.trans("error.gui_open_failed", e.getMessage()));
             }
          });
     }

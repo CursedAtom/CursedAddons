@@ -1,4 +1,4 @@
-package dev.cursedatom.cursedaddons.config;
+package dev.cursedatom.cursedaddons.config.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

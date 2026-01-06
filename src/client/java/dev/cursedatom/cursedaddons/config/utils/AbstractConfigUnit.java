@@ -1,4 +1,4 @@
-package dev.cursedatom.cursedaddons.config;
+package dev.cursedatom.cursedaddons.config.utils;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -6,9 +6,9 @@ import java.util.*;
 public abstract class AbstractConfigUnit {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static <T extends AbstractConfigUnit> T of(Object ele, Class<T> clazz) {
-        if (ele instanceof Map) {
-            Map<String, Object> map = (Map<String, Object>) ele;
+    public static <T extends AbstractConfigUnit> T of(Object element, Class<T> clazz) {
+        if (element instanceof Map) {
+            Map<String, Object> map = (Map<String, Object>) element;
             try {
                 T instance = clazz.getDeclaredConstructor().newInstance();
                 for (Field field : clazz.getDeclaredFields()) {
@@ -31,10 +31,10 @@ public abstract class AbstractConfigUnit {
             } catch (Exception e) {
                 throw new RuntimeException("Failed to deserialize " + clazz.getSimpleName(), e);
             }
-        } else if (clazz.isInstance(ele)) {
-            return (T) ele;
+        } else if (clazz.isInstance(element)) {
+            return (T) element;
         } else {
-            throw new IllegalArgumentException("Unexpected element type of Object: " + ele);
+            throw new IllegalArgumentException("Unexpected element type of Object: " + element);
         }
     }
 

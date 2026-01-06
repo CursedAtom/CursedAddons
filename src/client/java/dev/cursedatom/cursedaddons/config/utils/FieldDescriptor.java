@@ -1,4 +1,4 @@
-package dev.cursedatom.cursedaddons.config;
+package dev.cursedatom.cursedaddons.config.utils;
 
 import java.util.List;
 

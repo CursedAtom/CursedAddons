@@ -1,50 +1,48 @@
 package dev.cursedatom.cursedaddons.config;
 
+import dev.cursedatom.cursedaddons.config.utils.ConfigGui;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import dev.cursedatom.cursedaddons.utils.LoggerUtils;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.Map;
 
 
 public class ConfigScreenGenerator {
-    private static Map<String, Object> configGuiMap;
-    public static boolean configGuiMapInitialized = false;
+    private static ConfigGui configGui;
+    public static boolean configGuiInitialized = false;
     private static final Gson GSON = new GsonBuilder().create();
 
-    public static void loadConfigGuiMap() {
+    public static void loadConfigGui() {
         try {
-            InputStream inputStream = ConfigScreenGenerator.class.getClassLoader()
-                                                     .getResourceAsStream("assets/cursedaddons/config_gui.json");
+            InputStream inputStream = ConfigScreenGenerator.class.getClassLoader().getResourceAsStream("assets/cursedaddons/config_gui.json");
             if (inputStream == null) {
                 LoggerUtils.error("config_gui.json not found in assets/cursedaddons/");
                 return;
             }
             Reader reader = new InputStreamReader(inputStream);
-            configGuiMap = GSON.fromJson(reader, new TypeToken<Map<String, Object>>(){}.getType());
-            configGuiMapInitialized = true;
+            configGui = GSON.fromJson(reader, ConfigGui.class);
+            configGuiInitialized = true;
         } catch (Exception e) {
             LoggerUtils.error("Failed to load config_gui.json: " + e.getMessage());
         }
     }
 
-    public static Map<String, Object> getConfigGuiMap() {
-        if (!configGuiMapInitialized) {
-            loadConfigGuiMap();
+    public static ConfigGui getConfigGui() {
+        if (!configGuiInitialized) {
+            loadConfigGui();
         }
-        return configGuiMap;
+        return configGui;
     }
 
     public static Screen getConfigScreen(Screen parent) {
-        if (!configGuiMapInitialized) {
-            loadConfigGuiMap();
+        if (!configGuiInitialized) {
+            loadConfigGui();
         }
 
-        return new CustomConfigScreen(parent);
+        return new ConfigScreen(parent);
     }
 }

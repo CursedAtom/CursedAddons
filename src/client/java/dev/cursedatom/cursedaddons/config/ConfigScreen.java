@@ -1,5 +1,11 @@
 package dev.cursedatom.cursedaddons.config;
 
+import dev.cursedatom.cursedaddons.config.utils.AbstractConfigUnit;
+import dev.cursedatom.cursedaddons.config.utils.ConfigGui;
+import dev.cursedatom.cursedaddons.config.utils.ListManager;
+import dev.cursedatom.cursedaddons.config.utils.GenericEditScreen;
+import dev.cursedatom.cursedaddons.config.utils.Category;
+import dev.cursedatom.cursedaddons.config.utils.ConfigItem;
 import dev.cursedatom.cursedaddons.utils.ConfigUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -9,13 +15,12 @@ import net.minecraft.network.chat.Component;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import java.util.List;
-import java.util.Map;
 
 import static dev.cursedatom.cursedaddons.utils.TextUtils.trans;
 
-public class CustomConfigScreen extends Screen {
+public class ConfigScreen extends Screen {
     private final Screen parent;
-    private final Map<String, Object> configGuiMap;
+    private final ConfigGui configGui;
     private String selectedCategory;
 
     // List managers for different unit types
@@ -23,10 +28,10 @@ public class CustomConfigScreen extends Screen {
     private ListManager<SpecialUnits.AliasUnit> aliasManager;
     private ListManager<SpecialUnits.NotificationUnit> notificationManager;
 
-    public CustomConfigScreen(Screen parent) {
+    public ConfigScreen(Screen parent) {
         super(trans("gui.title"));
         this.parent = parent;
-        this.configGuiMap = ConfigScreenGenerator.getConfigGuiMap();
+        this.configGui = ConfigScreenGenerator.getConfigGui();
         initializeSelectedCategory();
         initializeListManagers();
     }
@@ -114,20 +119,17 @@ public class CustomConfigScreen extends Screen {
     }
 
     private void initializeSelectedCategory() {
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> categories = (List<Map<String, Object>>) configGuiMap.get("categories");
+        List<Category> categories = configGui.getCategories();
         if (categories != null && !categories.isEmpty()) {
-            selectedCategory = (String) categories.get(0).get("name");
+            selectedCategory = trans(categories.get(0).getNameKey()).getString();
         }
     }
 
-    private Class<?> getUnitClass(String type) {
-        switch (type) {
-            case "MacroList": return SpecialUnits.MacroUnit.class;
-            case "AliasList": return SpecialUnits.AliasUnit.class;
-            case "NotificationList": return SpecialUnits.NotificationUnit.class;
-            default: return null;
-        }
+    private Class<?> getUnitClassForList(String key) {
+        if ("chatkeybindings.Macro.List".equals(key)) return SpecialUnits.MacroUnit.class;
+        if ("commandaliases.Aliases.List".equals(key)) return SpecialUnits.AliasUnit.class;
+        if ("chatnotifications.Notifications.List".equals(key)) return SpecialUnits.NotificationUnit.class;
+        return null;
     }
 
 
@@ -136,8 +138,7 @@ public class CustomConfigScreen extends Screen {
     protected void init() {
         super.init();
 
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> categories = (List<Map<String, Object>>) configGuiMap.get("categories");
+        List<Category> categories = configGui.getCategories();
         if (categories == null) return;
 
         // Tab buttons at the top
@@ -147,16 +148,17 @@ public class CustomConfigScreen extends Screen {
         int tabY = 30;
 
         for (int i = 0; i < categories.size(); i++) {
-            final String categoryName = (String) categories.get(i).get("name");
+            final Category category = categories.get(i);
+            final String categoryName = trans(category.getNameKey()).getString();
             boolean isSelected = categoryName.equals(selectedCategory);
-            Button tabButton = Button.builder(trans("gui.category." + categoryName.toLowerCase().replace(" ", "")), button -> {
+            Button tabButton = Button.builder(trans(category.getNameKey()), button -> {
                 selectedCategory = categoryName;
                 this.clearWidgets();
                 this.init();
             }).bounds(startX + i * tabWidth, tabY, tabWidth, tabHeight).build();
 
             if (isSelected) {
-                tabButton.setMessage(Component.literal("[ " + tabButton.getMessage().getString() + " ]"));
+                tabButton.setMessage(Component.literal("§6§l[§r " + tabButton.getMessage().getString() + " §6§l]§r"));
             }
 
             this.addRenderableWidget(tabButton);
@@ -169,30 +171,30 @@ public class CustomConfigScreen extends Screen {
         int centerX = this.width / 2 - buttonWidth / 2;
 
         // Find selected category and add content
-        for (Map<String, Object> category : categories) {
-            String categoryName = (String) category.get("name");
+        for (Category category : categories) {
+            String categoryName = trans(category.getNameKey()).getString();
             if (!categoryName.equals(selectedCategory)) continue;
 
-            @SuppressWarnings("unchecked")
-            List<Map<String, Object>> content = (List<Map<String, Object>>) category.get("content");
+            List<ConfigItem> content = category.getContent();
             if (content == null) continue;
 
-            for (Map<String, Object> item : content) {
-                String type = (String) item.get("type");
-                String key = (String) item.get("key");
+            for (ConfigItem item : content) {
+                String type = item.getType();
+                String key = item.getKey();
 
                 if ("boolean".equals(type)) {
                     boolean value = (boolean) ConfigUtils.get(key);
+                    String label = item.getLabelKey() != null ? trans(item.getLabelKey()).getString() : trans(key).getString();
                     this.addRenderableWidget(Button.builder(
-                        Component.literal(trans(key).getString() + ": " + (value ? "§aON" : "§cOFF")),
+                        Component.literal(label + ": " + (value ? "§aON" : "§cOFF")),
                         button -> {
                             ConfigUtils.set(key, !value);
                             this.clearWidgets();
                             this.init();
                         }).bounds(centerX, contentY, buttonWidth, buttonHeight).build());
                     contentY += 25;
-                } else if (type.endsWith("List")) {
-                    Class<?> unitClass = getUnitClass(type);
+                } else if ("list".equals(type)) {
+                    Class<?> unitClass = getUnitClassForList(key);
                     if (unitClass != null) {
                         addListManagement(contentY, centerX, buttonWidth, buttonHeight, key, unitClass);
                         contentY += 200; // Estimate for list height
@@ -243,15 +245,15 @@ public class CustomConfigScreen extends Screen {
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        // Draw semi-transparent black background
-        guiGraphics.fill(0, 0, this.width, this.height, 0xAA000000); // Semi-transparent black
+        // Draw semi-transparent black background (darkens the screen)
+        guiGraphics.fill(0, 0, this.width, this.height, 0xAA000000);
 
-        // Draw slightly larger dark gray background for the config area
+        // Draw overlayed slightly darker background for the config area (shows bounds of the config window)
         int bgX = this.width / 2 - 250;
         int bgY = 20;
         int bgWidth = 500;
         int bgHeight = this.height - 40;
-        guiGraphics.fill(bgX, bgY, bgX + bgWidth, bgY + bgHeight, 0xAA030303); // Transparent dark gray... #030303
+        guiGraphics.fill(bgX, bgY, bgX + bgWidth, bgY + bgHeight, 0xAA000000);
     }
 
     @Override

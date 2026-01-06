@@ -1,13 +1,12 @@
 package dev.cursedatom.cursedaddons.utils;
 
-import dev.cursedatom.cursedaddons.config.ConfigStorage;
+import dev.cursedatom.cursedaddons.config.utils.ConfigStorage;
 
 public class ConfigUtils {
     public static ConfigStorage DEFAULT_CONFIG;
     public static ConfigStorage CONFIG;
 
     public static void init(){
-        // Initialize DEFAULT_CONFIG here to avoid static initialization issues if resources aren't ready
         if (DEFAULT_CONFIG == null) {
             DEFAULT_CONFIG = new ConfigStorage(true);
         }

@@ -16,7 +16,6 @@ public class KeyboardUtils {
         InputConstants.Key key = InputConstants.getKey(translationKey);
         int keyCode = key.getValue();
 
-        // This check is GREEDY
         if ((modifier.equals(SpecialUnits.KeyModifiers.ALT) &&
                 !(InputConstants.isKeyDown(window, GLFW.GLFW_KEY_LEFT_ALT) ||
                         InputConstants.isKeyDown(window, GLFW.GLFW_KEY_RIGHT_ALT)))

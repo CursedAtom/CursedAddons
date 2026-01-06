@@ -18,13 +18,6 @@ public class ClickEventsPreviewer {
         }
 
         HoverEvent hoverEvent = style.getHoverEvent();
-        
-        // Debug logging
-        // if (style.getClickEvent() != null) {
-        //    LoggerUtils.info("ClickEventsPreviewer: Processing style with ClickEvent: " + style.getClickEvent());
-        // }
-
-        // Skip if it's ShowItem or ShowEntity to preserve special rendering
 
         if (hoverEvent instanceof HoverEvent.ShowItem || hoverEvent instanceof HoverEvent.ShowEntity) {
             return style;
@@ -39,18 +32,14 @@ public class ClickEventsPreviewer {
         if (hoverEvent instanceof HoverEvent.ShowText showText) {
              oldHoverComponent = showText.value();
         }
-        
-        // Idempotency check: Don't append if already modified
         if (oldHoverComponent != null && oldHoverComponent.getString().contains(TextUtils.trans("texts.PreviewClickEvents.overall").getString())) {
             return style;
         }
 
         Component newHoverComponent;
         if (oldHoverComponent != null && !oldHoverComponent.getString().isBlank()) {
-            // Append with separator
             newHoverComponent = oldHoverComponent.copy().append(TextUtils.literal("\n\n")).append(textToAppend);
         } else {
-            // No previous text, just the preview
             newHoverComponent = textToAppend;
         }
 

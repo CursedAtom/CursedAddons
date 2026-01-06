@@ -1,9 +1,10 @@
-package dev.cursedatom.cursedaddons.config;
+package dev.cursedatom.cursedaddons.config.utils;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
+import static dev.cursedatom.cursedaddons.utils.TextUtils.trans;
 
 public class KeybindButton extends Button {
     private InputConstants.Key boundKey = InputConstants.UNKNOWN;
@@ -20,7 +21,7 @@ public class KeybindButton extends Button {
 
     public void updateDisplay() {
         if (waiting) {
-            this.setMessage(Component.translatable("key.cursedaddons.chatkeybindings.controls.keybind.waiting"));
+            this.setMessage(trans("chatkeybindings.controls.keybind.waiting"));
         } else {
             this.setMessage(getDisplayMessage(boundKey));
         }
