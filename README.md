@@ -13,19 +13,19 @@ CursedAddons is a Minecraft Fabric mod that enhances chat functionality with key
 ## Installation
 
 ### Prerequisites
-*   Minecraft Java Edition `1.21.10` (currently supported; future versions may be supported in updates)
-*   Fabric Loader `0.18.2` or newer
-*   Fabric API `0.138.3+1.21.10` or newer
+*   Minecraft Java Edition `26.1-snapshot-1` (currently supported; future versions may be supported in updates)
+*   Fabric Loader `0.18.4` or newer
+*   Fabric API `0.140.2+26.1`
+*   Java 25
 
 ### Steps
-1.  **Install Fabric Loader:** If you haven't already, download and install the Fabric Loader for Minecraft `1.21.10` from the [Fabric website](https://fabricmc.net/use/).
-2.  **Download Fabric API:** Download the Fabric API for `1.21.10` from its [Modrinth page](https://modrinth.com/mod/fabric-api).
-3.  **Download Cloth Config:** Download the Cloth Config API for `1.21.10` from its [Modrinth page](https://modrinth.com/mod/cloth-config).
+1.  **Install Fabric Loader:** If you haven't already, download and install the Fabric Loader for Minecraft `26.1-snapshot-1` from the [Fabric website](https://fabricmc.net/use/).
+2.  **Download Fabric API:** Download the Fabric API for `26.1-snapshot-1` from its [Modrinth page](https://modrinth.com/mod/fabric-api).
 3.  **Download CursedAddons**
 4.  **Place Mods in `mods` folder:**
     *   Locate your Minecraft installation directory.
     *   Navigate to the `mods` folder. If it doesn't exist, create one.
-    *   Place the downloaded `fabric-api-*.jar`, `cloth-config*.jar`, and `cursedaddons-*.jar` files into the `mods` folder.
+    *   Place the downloaded `fabric-api-*.jar` and `cursedaddons-*.jar` files into the `mods` folder.
 5.  **Launch Minecraft:** Start the Minecraft launcher, select the Fabric profile, and launch the game.
 
 ## Usage
@@ -113,19 +113,10 @@ For debugging ChatNotifications regex patterns, you can use the [regex tester](h
 - Preview how color codes will appear visually
 - Convert & color codes to § automatically (like the mod does)
 
-## Contributing
-Contributions are welcome! If you have suggestions, bug reports, or want to contribute code, please feel free to open an issue or pull request!
-
-## License
-This project is licensed under the GNU General Public License v3.0. See the `LICENSE` file for more details.
-
-#### Big shout out to 70CentsApple for the [original concept](https://github.com/70CentsApple/ChatTools)!
-
-
 ## Building from Source
 
 ### Prerequisites
-*   Java Development Kit (JDK) `21`
+*   Java Development Kit (JDK) `25`
 *   Git
 
 ### Steps

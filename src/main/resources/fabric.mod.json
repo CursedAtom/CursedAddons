@@ -16,6 +16,9 @@
 		],
 		"client": [
 			"dev.cursedatom.cursedaddons.CursedAddonsClient"
+		],
+		"modmenu": [
+			"dev.cursedatom.cursedaddons.modmenu.CursedAddonsModMenuIntegration"
 		]
 	},
 	"mixins": [
@@ -33,5 +36,14 @@
 	},
 	"suggests": {
 		"another-mod": "*"
+	},
+	"contact": {
+  		"homepage": "https://github.com/CursedAtom/CursedAddons",
+  		"issues": "https://github.com/CursedAtom/CursedAddons/issues"
+	},
+	"custom": {
+		"modmenu": {
+			"update_checker": true
+		}
 	}
 }

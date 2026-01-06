@@ -1,3 +1,15 @@
+## [1.0.2.26-snapshot] - 2026-01-03
+
+### What's New
+```diff
++ Updated to Minecraft 26.1-snapshot-1
++ Updated to Java 25
++ Updated Fabric Loader to 0.18.4
++ Updated Fabric API to 0.140.2+26.1 (Cannot bump until ModMenu updates, ClientCommandManager -> ClientCommands for >=0.140.3+26.1)
++ Updated ModMenu to 18.0.0-alpha.3
+- Removed Cloth Config dependency and replaced with custom config system
+```
+
 ## [1.0.1] - 2025-12-30
 
 ### What's New

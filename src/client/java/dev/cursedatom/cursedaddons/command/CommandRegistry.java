@@ -9,20 +9,20 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
 
-import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 
 public class CommandRegistry {
     public static boolean shouldOpenConfigScreen = false;
 
     public static void register() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            dispatcher.register(ClientCommands.literal("cursedaddons")
+            dispatcher.register(ClientCommandManager.literal("cursedaddons")
                 .executes(context -> {
                     // Default action: open gui
                      openGui(context);
                      return Command.SINGLE_SUCCESS;
                 })
-                .then(ClientCommands.literal("config")
+                .then(ClientCommandManager.literal("config")
                     .executes(context -> {
                         openGui(context);
                         return Command.SINGLE_SUCCESS;
