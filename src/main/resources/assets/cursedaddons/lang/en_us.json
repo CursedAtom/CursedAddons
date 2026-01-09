@@ -69,6 +69,8 @@
   "key.cursedaddons.texts.PreviewClickEvents.clickEvent.copyToClipboard": "§c - §rCopy To Clipboard: %s",
   "key.cursedaddons.texts.PreviewClickEvents.clickEvent.custom": "§c - §rCustom: %s",
   "text.cursedaddons.error.gui_open_failed": "Failed to open CursedAddons config GUI: %s",
+  "text.cursedaddons.error.invalid_json": "Invalid JSON in fakechat command: %s",
+  "text.cursedaddons.error.fakechat_failed": "Failed to execute fakechat command: %s",
   "modmenu.nameTranslation.cursedaddons": "CursedAddons",
   "modmenu.descriptionTranslation.cursedaddons": "A toolkit that provides Chat Keybindings, Command Aliases, Chat Notifications, and Preview Chat Events features."
 }
