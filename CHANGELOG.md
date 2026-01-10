@@ -26,7 +26,7 @@
 
 ### Added
 ```diff
-+ Implemented MC-122477 Fix (Double Chat Fix) for Linux systems
++ Implemented MC-122477 Fix (Double Chat Fix) for Unix systems
 ```
 ### Changed
 ```diff

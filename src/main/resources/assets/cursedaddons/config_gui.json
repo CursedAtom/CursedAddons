@@ -1,51 +1,184 @@
 {
-  "version": 1,
+  "version": 2,
   "categories": [
     {
-      "name": "General",
+      "nameKey": "category.general",
       "content": [
         {
           "type": "boolean",
-          "key": "general.PreviewClickEvents.Enabled"
+          "key": "general.PreviewClickEvents.Enabled",
+          "labelKey": "preview_click_events.enabled"
         }
       ]
     },
     {
-      "name": "Chat Keybindings",
+      "nameKey": "category.chat_keybindings",
       "content": [
         {
           "type": "boolean",
-          "key": "chatkeybindings.Macro.Enabled"
+          "key": "chatkeybindings.Macro.Enabled",
+          "labelKey": "macro.enabled",
+          "descriptionKey": "macro.enabled.description"
         },
         {
-          "type": "MacroList",
-          "key": "chatkeybindings.Macro.List"
+          "type": "list",
+          "key": "chatkeybindings.Macro.List",
+          "labelKey": "macro.list",
+          "fields": [
+            {
+              "name": "key",
+              "type": "keybind",
+              "labelKey": "field.key",
+              "required": true
+            },
+            {
+              "name": "modifier",
+              "type": "cycle",
+              "labelKey": "field.modifier",
+              "options": ["NONE", "SHIFT", "ALT", "CTRL"],
+              "optionKeys": [
+                "modifier.none",
+                "modifier.shift",
+                "modifier.alt",
+                "modifier.ctrl"
+              ],
+              "default": "NONE"
+            },
+            {
+              "name": "command",
+              "type": "text",
+              "labelKey": "field.command",
+              "hintKey": "field.command.hint",
+              "maxLength": 1000,
+              "required": true
+            },
+            {
+              "name": "enabled",
+              "type": "toggle",
+              "labelKey": "field.enabled",
+              "default": true
+            }
+          ]
         }
       ]
     },
     {
-      "name": "Command Aliases",
+      "nameKey": "category.command_aliases",
       "content": [
         {
           "type": "boolean",
-          "key": "commandaliases.Aliases.Enabled"
+          "key": "commandaliases.Aliases.Enabled",
+          "labelKey": "command_aliases.enabled",
+          "descriptionKey": "command_aliases.enabled.description"
         },
         {
-          "type": "AliasList",
-          "key": "commandaliases.Aliases.List"
+          "type": "list",
+          "key": "commandaliases.Aliases.List",
+          "labelKey": "alias.list",
+          "fields": [
+            {
+              "name": "alias",
+              "type": "text",
+              "labelKey": "field.alias",
+              "hintKey": "field.alias.hint",
+              "maxLength": 1000,
+              "required": true
+            },
+            {
+              "name": "replacement",
+              "type": "text",
+              "labelKey": "field.replacement",
+              "hintKey": "field.replacement.hint",
+              "maxLength": 1000,
+              "required": true
+            },
+            {
+              "name": "enabled",
+              "type": "toggle",
+              "labelKey": "field.enabled",
+              "default": true
+            }
+          ]
         }
       ]
     },
     {
-      "name": "Chat Notifications",
+      "nameKey": "category.chat_notifications",
       "content": [
         {
           "type": "boolean",
-          "key": "chatnotifications.Notifications.Enabled"
+          "key": "chatnotifications.Notifications.Enabled",
+          "labelKey": "notifications.enabled",
+          "descriptionKey": "notifications.enabled.description"
         },
         {
-          "type": "NotificationList",
-          "key": "chatnotifications.Notifications.List"
+          "type": "list",
+          "key": "chatnotifications.Notifications.List",
+          "labelKey": "notifications.list",
+          "fields": [
+            {
+              "name": "pattern",
+              "type": "text",
+              "labelKey": "field.pattern",
+              "hintKey": "field.pattern.hint",
+              "maxLength": 2000,
+              "required": true
+            },
+            {
+              "name": "regex",
+              "type": "toggle",
+              "labelKey": "field.regex",
+              "default": false
+            },
+            {
+              "name": "sound",
+              "type": "text",
+              "labelKey": "field.sound",
+              "hintKey": "field.sound.hint",
+              "maxLength": 1000,
+              "required": false
+            },
+            {
+              "name": "soundEnabled",
+              "type": "toggle",
+              "labelKey": "field.soundEnabled",
+              "default": false
+            },
+            {
+              "name": "title",
+              "type": "text",
+              "labelKey": "field.title",
+              "hintKey": "field.title.hint",
+              "maxLength": 1000,
+              "required": false
+            },
+            {
+              "name": "titleEnabled",
+              "type": "toggle",
+              "labelKey": "field.titleEnabled",
+              "default": false
+            },
+            {
+              "name": "command",
+              "type": "text",
+              "labelKey": "field.command",
+              "hintKey": "field.command.hint",
+              "maxLength": 1000,
+              "required": false
+            },
+            {
+              "name": "commandEnabled",
+              "type": "toggle",
+              "labelKey": "field.commandEnabled",
+              "default": false
+            },
+            {
+              "name": "enabled",
+              "type": "toggle",
+              "labelKey": "field.enabled",
+              "default": true
+            }
+          ]
         }
       ]
     }

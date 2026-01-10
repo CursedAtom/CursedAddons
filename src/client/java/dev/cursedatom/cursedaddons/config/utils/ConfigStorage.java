@@ -1,4 +1,4 @@
-package dev.cursedatom.cursedaddons.config;
+package dev.cursedatom.cursedaddons.config.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -11,8 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class ConfigStorage {
-    public static final File FILE = new File(net.fabricmc.loader.api.FabricLoader.getInstance().getConfigDir()
-                                                                                 .toFile(), "cursedaddons.json");
+    public static final File FILE = new File(net.fabricmc.loader.api.FabricLoader.getInstance().getConfigDir().toFile(), "cursedaddons.json");
 
     private Map<String, Object> configMap;
 

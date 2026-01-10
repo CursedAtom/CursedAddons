@@ -10,7 +10,7 @@ import net.minecraft.util.FormattedCharSink;
 import java.util.List;
 
 public class TextUtils {
-    public static final String PREFIX = "key.cursedaddons.";
+    public static final String PREFIX = "cursedaddons.";
     public static final Component SPACER = literal("");
 
     public static Component literal(String str) {

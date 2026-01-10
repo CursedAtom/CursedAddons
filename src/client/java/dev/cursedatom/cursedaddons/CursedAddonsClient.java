@@ -31,7 +31,7 @@ public class CursedAddonsClient implements ClientModInitializer {
         // Cache initial config state
         updateCachedConfig();
 
-		ClientTickEvents.START_WORLD_TICK.register(client -> {
+		ClientTickEvents.START_CLIENT_TICK.register(client -> {
             if (macroEnabled) {
                 Macro.tick();
             }
@@ -43,7 +43,7 @@ public class CursedAddonsClient implements ClientModInitializer {
                 if (currentScreen instanceof net.minecraft.client.gui.screens.ChatScreen) {
                     Minecraft.getInstance().setScreen(null); // Close the chat screen if it's still open
                 }
-                Minecraft.getInstance().setScreen(ConfigScreenGenerator.getConfigBuilder().setParentScreen(currentScreen).build());
+                Minecraft.getInstance().setScreen(ConfigScreenGenerator.getConfigScreen(currentScreen));
                 CommandRegistry.shouldOpenConfigScreen = false; // Reset the flag
             }
         });

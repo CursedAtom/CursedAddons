@@ -6,8 +6,7 @@
 		"ChatComponentMixin",
 		"ChatScreenMixin",
 		"ClientPacketListenerMixin",
-		"MixinKeyboard",
-		"MultiElementListEntryMixin"
+		"MixinKeyboard"
 	],
 	"injectors": {
 		"defaultRequire": 1
