@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 
 import java.util.List;
 
+
 public class SpecialUnits {
 
     public enum KeyModifiers {
@@ -107,6 +108,29 @@ public class SpecialUnits {
 
         public static List<NotificationUnit> fromList(List<Object> list) {
             return AbstractConfigUnit.fromList(list, NotificationUnit.class);
+        }
+    }
+
+    public static class WhitelistUnit extends AbstractConfigUnit {
+        public String domain;
+        public boolean enabled;
+
+        public WhitelistUnit() {
+            this.domain = "";
+            this.enabled = true;
+        }
+
+        public WhitelistUnit(String domain, boolean enabled) {
+            this.domain = domain;
+            this.enabled = enabled;
+        }
+
+        public static WhitelistUnit of(Object ele) {
+            return AbstractConfigUnit.of(ele, WhitelistUnit.class);
+        }
+
+        public static List<WhitelistUnit> fromList(List<Object> list) {
+            return AbstractConfigUnit.fromList(list, WhitelistUnit.class);
         }
     }
 }

@@ -2,6 +2,7 @@ package dev.cursedatom.cursedaddons.config.utils;
 
 import dev.cursedatom.cursedaddons.config.ConfigScreenGenerator;
 import dev.cursedatom.cursedaddons.config.ConfigScreen;
+import dev.cursedatom.cursedaddons.config.WhitelistScreen;
 import dev.cursedatom.cursedaddons.config.SpecialUnits;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -40,6 +41,7 @@ public class GenericEditScreen extends Screen {
         if (unitClass == SpecialUnits.MacroUnit.class) return "Macro";
         if (unitClass == SpecialUnits.AliasUnit.class) return "Alias";
         if (unitClass == SpecialUnits.NotificationUnit.class) return "Notification";
+        if (unitClass == SpecialUnits.WhitelistUnit.class) return "Whitelist Domain";
         return "Unit";
     }
 
@@ -66,6 +68,7 @@ public class GenericEditScreen extends Screen {
         if ("chatkeybindings.Macro.List".equals(configKey) && unitClass == SpecialUnits.MacroUnit.class) return true;
         if ("commandaliases.Aliases.List".equals(configKey) && unitClass == SpecialUnits.AliasUnit.class) return true;
         if ("chatnotifications.Notifications.List".equals(configKey) && unitClass == SpecialUnits.NotificationUnit.class) return true;
+        if ("general.ImageHoverPreview.Whitelist".equals(configKey) && unitClass == SpecialUnits.WhitelistUnit.class) return true;
         return false;
     }
 
@@ -90,7 +93,22 @@ public class GenericEditScreen extends Screen {
         // Create widgets based on field definitions
         for (FieldDefinition fieldDef : fieldDefinitions) {
             Object initialValue = initialValues.get(fieldDef.getName());
-            AbstractWidget widget = FieldWidgetFactory.createWidget(fieldDef, centerX, y, buttonWidth, buttonHeight, initialValue, this.font);
+            AbstractWidget widget;
+
+            // Handle keybind fields specially to wire up the waiting callback
+            if ("keybind".equals(fieldDef.getType())) {
+                widget = FieldWidgetFactory.createKeybindWidget(fieldDef, centerX, y, buttonWidth, buttonHeight, initialValue, (Button.OnPress) button -> {
+                    if (this.waitingButton != null) {
+                        this.waitingButton.stopWaiting();
+                    }
+                    KeybindButton keybindButton = (KeybindButton) button;
+                    keybindButton.startWaiting();
+                    this.waitingButton = keybindButton;
+                });
+            } else {
+                widget = FieldWidgetFactory.createWidget(fieldDef, centerX, y, buttonWidth, buttonHeight, initialValue, this.font);
+            }
+
             widgetMap.put(fieldDef.getName(), widget);
             this.addRenderableWidget(widget);
             y += ("text".equals(fieldDef.getType()) ? 30 : 25);
@@ -124,8 +142,6 @@ public class GenericEditScreen extends Screen {
             throw new RuntimeException("Failed to load values from unit", e);
         }
     }
-
-
 
     @Override
     public boolean keyPressed(final KeyEvent event) {
@@ -173,17 +189,29 @@ public class GenericEditScreen extends Screen {
                     if (!field.canAccess(newUnit)) {
                         field.setAccessible(true);
                     }
+
+                    // Convert String to enum if field is an enum type
+                    if (field.getType().isEnum() && value instanceof String) {
+                        @SuppressWarnings({"unchecked", "rawtypes"})
+                        Enum enumValue = Enum.valueOf((Class<Enum>) field.getType(), (String) value);
+                        value = enumValue;
+                    }
+
                     field.set(newUnit, value);
                 }
             }
 
             // Special handling for key field
             if (selectedKey != null && selectedKey != InputConstants.UNKNOWN) {
-                Field keyField = unitClass.getDeclaredField("key");
-                if (!keyField.canAccess(newUnit)) {
-                    keyField.setAccessible(true);
+                try {
+                    Field keyField = unitClass.getDeclaredField("key");
+                    if (!keyField.canAccess(newUnit)) {
+                        keyField.setAccessible(true);
+                    }
+                    keyField.set(newUnit, selectedKey.getName());
+                } catch (NoSuchFieldException ignored) {
+                    // Unit doesn't have a key field (e.g. WhitelistUnit), ignore
                 }
-                keyField.set(newUnit, selectedKey.getName());
             }
 
             if (!isValidUnit(newUnit)) {
@@ -192,6 +220,8 @@ public class GenericEditScreen extends Screen {
 
             if (parent instanceof ConfigScreen) {
                 ((ConfigScreen) parent).onUnitSaved(newUnit, editingIndex, unitClass);
+            } else if (parent instanceof WhitelistScreen) {
+                ((WhitelistScreen) parent).onUnitSaved(newUnit, editingIndex, unitClass);
             }
             this.onClose();
 
@@ -199,8 +229,6 @@ public class GenericEditScreen extends Screen {
             throw new RuntimeException("Failed to save unit", e);
         }
     }
-
-
 
     private boolean isValidUnit(AbstractConfigUnit unit) {
         try {

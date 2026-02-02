@@ -1,7 +1,6 @@
 package dev.cursedatom.cursedaddons.config.utils;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import static dev.cursedatom.cursedaddons.utils.TextUtils.trans;

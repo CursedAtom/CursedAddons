@@ -1,7 +1,7 @@
 package dev.cursedatom.cursedaddons.features.chatkeybindings;
 
 import dev.cursedatom.cursedaddons.config.SpecialUnits;
-import dev.cursedatom.cursedaddons.utils.ConfigUtils;
+import dev.cursedatom.cursedaddons.utils.ConfigProvider;
 import dev.cursedatom.cursedaddons.utils.KeyboardUtils;
 import dev.cursedatom.cursedaddons.utils.MessageUtils;
 import net.minecraft.client.Minecraft;
@@ -18,7 +18,7 @@ public class Macro {
             return;
         }
         
-        Object macroListObj = ConfigUtils.get("chatkeybindings.Macro.List");
+        Object macroListObj = ConfigProvider.get("chatkeybindings.Macro.List");
         if (macroListObj == null) return;
 
         @SuppressWarnings("unchecked")

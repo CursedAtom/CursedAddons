@@ -8,6 +8,86 @@
           "type": "boolean",
           "key": "general.PreviewClickEvents.Enabled",
           "labelKey": "preview_click_events.enabled"
+        },
+        {
+          "type": "boolean",
+          "key": "general.ImageHoverPreview.Enabled",
+          "labelKey": "image_hover_preview.enabled"
+        },
+        {
+          "type": "button",
+          "key": "general.ImageHoverPreview.OpenWhitelist",
+          "labelKey": "image_hover_preview.open_whitelist"
+        },
+        {
+          "type": "list",
+          "key": "general.ImageHoverPreview.Whitelist",
+          "labelKey": "image_hover_preview.whitelist",
+          "hidden": true,
+          "fields": [
+            {
+              "name": "domain",
+              "type": "text",
+              "labelKey": "field.domain",
+              "hintKey": "field.domain.hint",
+              "maxLength": 1000,
+              "required": true
+            },
+            {
+              "name": "enabled",
+              "type": "toggle",
+              "labelKey": "field.enabled",
+              "default": true
+            }
+          ]
+        },
+        {
+          "type": "integer",
+          "key": "general.ImageHoverPreview.MaxWidth",
+          "labelKey": "image_hover_preview.max_width",
+          "min": 50,
+          "max": 800,
+          "default": 280
+        },
+        {
+          "type": "integer",
+          "key": "general.ImageHoverPreview.MaxHeight",
+          "labelKey": "image_hover_preview.max_height",
+          "min": 50,
+          "max": 600,
+          "default": 200
+        },
+        {
+          "type": "integer",
+          "key": "general.ImageHoverPreview.PaddingLeft",
+          "labelKey": "image_hover_preview.padding_left",
+          "min": 0,
+          "max": 100,
+          "default": 8
+        },
+        {
+          "type": "integer",
+          "key": "general.ImageHoverPreview.PaddingRight",
+          "labelKey": "image_hover_preview.padding_right",
+          "min": 0,
+          "max": 100,
+          "default": 8
+        },
+        {
+          "type": "integer",
+          "key": "general.ImageHoverPreview.PaddingTop",
+          "labelKey": "image_hover_preview.padding_top",
+          "min": 0,
+          "max": 100,
+          "default": 8
+        },
+        {
+          "type": "integer",
+          "key": "general.ImageHoverPreview.PaddingBottom",
+          "labelKey": "image_hover_preview.padding_bottom",
+          "min": 0,
+          "max": 100,
+          "default": 8
         }
       ]
     },

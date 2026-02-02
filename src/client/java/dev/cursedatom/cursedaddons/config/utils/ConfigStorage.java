@@ -3,7 +3,7 @@ package dev.cursedatom.cursedaddons.config.utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import dev.cursedatom.cursedaddons.utils.ConfigUtils;
+import dev.cursedatom.cursedaddons.utils.ConfigProvider;
 import dev.cursedatom.cursedaddons.utils.LoggerUtils;
 
 import java.io.*;
@@ -42,14 +42,16 @@ public class ConfigStorage {
 
     public void readConfigFile(boolean loadDefault) {
         try {
-            Reader reader;
             if (loadDefault) {
-                reader = new InputStreamReader(ConfigStorage.class.getClassLoader()
-                                                        .getResourceAsStream("assets/cursedaddons/default_config.json"));
+                try (Reader reader = new InputStreamReader(ConfigStorage.class.getClassLoader()
+                                                        .getResourceAsStream("assets/cursedaddons/default_config.json"))) {
+                    configMap = GSON.fromJson(reader, new TypeToken<Map<String, Object>>(){}.getType());
+                }
             } else {
-                reader = new InputStreamReader(new FileInputStream(FILE), StandardCharsets.UTF_8);
+                try (Reader reader = new InputStreamReader(new FileInputStream(FILE), StandardCharsets.UTF_8)) {
+                    configMap = GSON.fromJson(reader, new TypeToken<Map<String, Object>>(){}.getType());
+                }
             }
-            configMap = GSON.fromJson(reader, new TypeToken<Map<String, Object>>(){}.getType());
         } catch (Exception e) {
             LoggerUtils.error("[CursedAddons] Failed to load config file: " + e.getMessage());
             configMap = null;
@@ -59,8 +61,8 @@ public class ConfigStorage {
     public Object get(String key) {
         if (this.hasKey(key)) {
             return configMap.get(key);
-        } else if (ConfigUtils.DEFAULT_CONFIG != null && ConfigUtils.DEFAULT_CONFIG.hasKey(key)) {
-            return ConfigUtils.DEFAULT_CONFIG.get(key);
+        } else if (ConfigProvider.DEFAULT_CONFIG != null && ConfigProvider.DEFAULT_CONFIG.hasKey(key)) {
+            return ConfigProvider.DEFAULT_CONFIG.get(key);
         } else {
             LoggerUtils.error("[CursedAddons] Error occurred when getting variable \"" + key + "\", no such key!");
             return null;

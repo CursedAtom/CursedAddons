@@ -1,7 +1,7 @@
 package dev.cursedatom.cursedaddons.features.chatnotifications;
 
 import dev.cursedatom.cursedaddons.config.SpecialUnits;
-import dev.cursedatom.cursedaddons.utils.ConfigUtils;
+import dev.cursedatom.cursedaddons.utils.ConfigProvider;
 import dev.cursedatom.cursedaddons.utils.LoggerUtils;
 import dev.cursedatom.cursedaddons.utils.MessageUtils;
 import dev.cursedatom.cursedaddons.utils.TextUtils;
@@ -16,6 +16,31 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ChatNotifications {
+
+    private static final int MAX_PATTERN_LENGTH = 500;
+
+    /**
+     * Validates regex pattern to prevent ReDoS attacks.
+     * Rejects patterns with nested quantifiers and excessive length.
+     */
+    private static boolean isPatternSafe(String pattern) {
+        if (pattern == null || pattern.length() > MAX_PATTERN_LENGTH) {
+            return false;
+        }
+
+        // Check for nested quantifiers that can cause catastrophic backtracking
+        // Patterns like (a+)+, (a*)*, (a+)*, (a{1,5})+, etc.
+        if (pattern.matches(".*\\([^)]*[+*{][^)]*\\)[+*{].*")) {
+            return false;
+        }
+
+        // Check for alternation with repetition: (a|b)+
+        if (pattern.matches(".*\\([^)]*\\|[^)]*\\)[+*{].*")) {
+            return false;
+        }
+
+        return true;
+    }
 
     private static String replaceCaptureGroups(String template, Matcher matcher) {
         String result = template;
@@ -38,10 +63,10 @@ public class ChatNotifications {
         if (message == null) return;
         if (Minecraft.getInstance().player == null) return;
 
-        Object enabledObj = ConfigUtils.get("chatnotifications.Notifications.Enabled");
+        Object enabledObj = ConfigProvider.get("chatnotifications.Notifications.Enabled");
         if (enabledObj == null || !(boolean) enabledObj) return;
 
-        Object notificationListObj = ConfigUtils.get("chatnotifications.Notifications.List");
+        Object notificationListObj = ConfigProvider.get("chatnotifications.Notifications.List");
         if (notificationListObj == null) return;
 
         String plainText = message.getString();
@@ -63,6 +88,13 @@ public class ChatNotifications {
                 }
                 try { // this allows color codes to be used in the regex
                     String pattern = notification.pattern.replace("&r", "").replace("\\&", "&").replace("&", "§");
+
+                    // Validate pattern safety to prevent ReDoS attacks
+                    if (!isPatternSafe(pattern)) {
+                        LoggerUtils.warn("[CursedAddons] Unsafe regex pattern detected (potential ReDoS): " + notification.pattern);
+                        continue;
+                    }
+
                     Pattern p = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
                     matcher = p.matcher(textToMatch);
                     matches = matcher.find();

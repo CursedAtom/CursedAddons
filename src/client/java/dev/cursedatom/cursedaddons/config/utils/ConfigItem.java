@@ -8,6 +8,7 @@ public class ConfigItem {
     private String labelKey;
     private String descriptionKey;
     private List<FieldDefinition> fields;
+    private boolean hidden;
 
     public ConfigItem() {}
 
@@ -49,5 +50,13 @@ public class ConfigItem {
 
     public void setFields(List<FieldDefinition> fields) {
         this.fields = fields;
+    }
+
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
     }
 }

@@ -1,7 +1,7 @@
 package dev.cursedatom.cursedaddons.features.commandaliases;
 
 import dev.cursedatom.cursedaddons.config.SpecialUnits;
-import dev.cursedatom.cursedaddons.utils.ConfigUtils;
+import dev.cursedatom.cursedaddons.utils.ConfigProvider;
 
 import java.util.List;
 
@@ -11,12 +11,12 @@ public class AliasHandler {
             return message;
         }
 
-        Object enabledObj = ConfigUtils.get("commandaliases.Aliases.Enabled");
+        Object enabledObj = ConfigProvider.get("commandaliases.Aliases.Enabled");
         if (enabledObj == null || !(boolean) enabledObj) {
             return message;
         }
 
-        Object aliasListObj = ConfigUtils.get("commandaliases.Aliases.List");
+        Object aliasListObj = ConfigProvider.get("commandaliases.Aliases.List");
         if (aliasListObj == null) {
             return message;
         }
@@ -27,12 +27,12 @@ public class AliasHandler {
 
         for (SpecialUnits.AliasUnit alias : aliases) {
             if (alias.enabled && !alias.alias.isEmpty() && message.startsWith(alias.alias + " ")) {
-                String replaced = message.replaceFirst(alias.alias, alias.replacement);
+                // Use substring instead of replaceFirst to avoid regex metacharacter interpretation
+                String replaced = alias.replacement + message.substring(alias.alias.length());
                 return replaced;
             } else if (alias.enabled && !alias.alias.isEmpty() && message.equals(alias.alias)) {
                 // Exact match
-                String replaced = alias.replacement;
-                return replaced;
+                return alias.replacement;
             }
         }
 

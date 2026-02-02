@@ -7,7 +7,9 @@ CursedAddons is a Minecraft Fabric mod that enhances chat functionality with key
 *   **Command Keybindings**: Define custom hotkeys and key combinations (e.g., Shift+F1) to instantly send predefined chat messages or commands.
 *   **Command Aliases**: Create shortcuts for frequently used commands or messages (e.g., `/s` → `/say` or `/about` → `Hello, my name is John Smith`).
 *   **Click Events Preview**: When hovering over clickable text in chat, preview what actions will occur (opening URLs, running commands, copying to clipboard, etc.) before clicking.
+*   **Image Hover Preview**: Preview images directly in chat by hovering over image URLs. Supports PNG, JPG, GIF, and WebP with domain whitelisting.
 *   **Chat Notifications**: Set up custom notifications for specific chat messages using string matching or regex patterns. Notifications can play sounds, set window titles, or execute commands when triggered.
+*   **Fake Chat Messages**: Send custom formatted messages to chat using tellraw JSON syntax, including colors, links, and interactive elements.
 *   **Fixes MC-122477**: Fixes a bug on Unix systems where the key to open commands and/or chat can sometimes be doubled when pressed.
 
 ## Installation
@@ -20,12 +22,11 @@ CursedAddons is a Minecraft Fabric mod that enhances chat functionality with key
 ### Steps
 1.  **Install Fabric Loader:** If you haven't already, download and install the Fabric Loader for Minecraft `1.21.10` from the [Fabric website](https://fabricmc.net/use/).
 2.  **Download Fabric API:** Download the Fabric API for `1.21.10` from its [Modrinth page](https://modrinth.com/mod/fabric-api).
-3.  **Download Cloth Config:** Download the Cloth Config API for `1.21.10` from its [Modrinth page](https://modrinth.com/mod/cloth-config).
 3.  **Download CursedAddons**
 4.  **Place Mods in `mods` folder:**
     *   Locate your Minecraft installation directory.
     *   Navigate to the `mods` folder. If it doesn't exist, create one.
-    *   Place the downloaded `fabric-api-*.jar`, `cloth-config*.jar`, and `cursedaddons-*.jar` files into the `mods` folder.
+    *   Place the downloaded `fabric-api-*.jar` and `cursedaddons-*.jar` files into the `mods` folder.
 5.  **Launch Minecraft:** Start the Minecraft launcher, select the Fabric profile, and launch the game.
 
 ## Usage
@@ -80,6 +81,19 @@ This feature shows a preview of what will happen when you click on interactive t
 
 This helps you verify links and commands before clicking them.
 
+#### Image Hover Preview
+This feature displays image previews when hovering over image URLs in chat.
+
+1. In the config screen, check "Enable Image Hover Preview"
+2. Click "Open Domain Whitelist" to manage allowed domains
+3. Add trusted domains (e.g., `imgur.com`, `i.redd.it`)
+4. Hover over any clickable* image URL from whitelisted domains to see a preview
+5. Supports PNG, JPG, JPEG, GIF (animated), and WebP formats
+
+-# *note: Currently only supports images that are clickable with a formatting attribute of open_url.
+
+**Security Note**: Only images from whitelisted domains will be previewed. This helps prevent leaking your IP if someone used an ip logger image link.
+
 #### Chat Notifications
 This feature allows you to set up automatic notifications for specific chat messages using string matching or regex patterns.
 
@@ -106,21 +120,22 @@ This feature allows you to set up automatic notifications for specific chat mess
 - Send `/tell $1 Welcome! You earned \$100!` when someone joins (literal $ in message)
 - Use regex like "&6([^ ]+) was banned" to capture something like "§6Player123 was banned"
 
+#### Fake Chat Messages
+This feature allows you to send custom formatted messages to chat using Minecraft's tellraw command syntax.
+
+1. Use the command `/cursedaddons fakechat <json>` where <json> is a JSON string in tellraw format
+2. Examples:
+   - `/cursedaddons fakechat {"text":"Hello World","color":"red"}` - Sends red "Hello World"
+   - `/cursedaddons fakechat ["",{"text":"[Click Here]","click_event":{"action":"open_url","url":"https://example.com"}}," ",{"text":"[Hover Here]","hover_event":{"action":"show_text","value":"You can see this text here!"}}]` - Sends clickable text and hoverable text
+
+For more information on tellraw syntax, see the [Minecraft Wiki](https://minecraft.wiki/w/Raw_JSON_text_format).
+
 ### Regex Tester
 For debugging ChatNotifications regex patterns, you can use the [regex tester](https://cursedatom.github.io/CursedAddons/docs/regex-tester/). This tool allows you to:
 - Test regex patterns against Minecraft chat messages with § color codes
 - See capture groups in the same format used by the mod ($0, $1, etc.)
 - Preview how color codes will appear visually
 - Convert & color codes to § automatically (like the mod does)
-
-## Contributing
-Contributions are welcome! If you have suggestions, bug reports, or want to contribute code, please feel free to open an issue or pull request!
-
-## License
-This project is licensed under the GNU General Public License v3.0. See the `LICENSE` file for more details.
-
-#### Big shout out to 70CentsApple for the [original concept](https://github.com/70CentsApple/ChatTools)!
-
 
 ## Building from Source
 

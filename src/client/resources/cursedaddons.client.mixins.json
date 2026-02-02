@@ -6,6 +6,7 @@
 		"ChatComponentMixin",
 		"ChatScreenMixin",
 		"ClientPacketListenerMixin",
+		"DrawContextMixin",
 		"MixinKeyboard"
 	],
 	"injectors": {

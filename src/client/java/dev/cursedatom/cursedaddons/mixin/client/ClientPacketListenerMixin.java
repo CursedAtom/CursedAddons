@@ -23,6 +23,9 @@ public abstract class ClientPacketListenerMixin {
     @Inject(method = "handlePlayerChat", at = @At("TAIL"))
     public void onPlayerChat(ClientboundPlayerChatPacket packet, CallbackInfo ci) {
         Component message = packet.unsignedContent();
+        if (message == null) {
+            message = Component.literal(packet.body().content());
+        }
         ChatNotifications.checkMessage(message);
     }
 

@@ -2,8 +2,25 @@ package dev.cursedatom.cursedaddons.config.utils;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractConfigUnit {
+
+    // Cache field arrays to avoid repeated reflection overhead
+    private static final Map<Class<?>, Field[]> FIELD_CACHE = new ConcurrentHashMap<>();
+
+    /**
+     * Gets cached fields for a class, making them accessible.
+     */
+    private static Field[] getCachedFields(Class<?> clazz) {
+        return FIELD_CACHE.computeIfAbsent(clazz, c -> {
+            Field[] fields = c.getDeclaredFields();
+            for (Field field : fields) {
+                field.setAccessible(true);
+            }
+            return fields;
+        });
+    }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static <T extends AbstractConfigUnit> T of(Object element, Class<T> clazz) {
@@ -11,10 +28,7 @@ public abstract class AbstractConfigUnit {
             Map<String, Object> map = (Map<String, Object>) element;
             try {
                 T instance = clazz.getDeclaredConstructor().newInstance();
-                for (Field field : clazz.getDeclaredFields()) {
-                    if (!field.canAccess(instance)) {
-                        field.setAccessible(true);
-                    }
+                for (Field field : getCachedFields(clazz)) {
                     String fieldName = field.getName();
                     Object value = map.getOrDefault(fieldName, getDefaultValue(field));
                     if (value != null) {
@@ -48,10 +62,7 @@ public abstract class AbstractConfigUnit {
 
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
-        for (Field field : this.getClass().getDeclaredFields()) {
-            if (!field.canAccess(this)) {
-                field.setAccessible(true);
-            }
+        for (Field field : getCachedFields(this.getClass())) {
             try {
                 Object value = field.get(this);
                 if (value != null && field.getType().isEnum()) {
@@ -71,10 +82,7 @@ public abstract class AbstractConfigUnit {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         try {
-            for (Field field : getClass().getDeclaredFields()) {
-                if (!field.canAccess(this)) {
-                    field.setAccessible(true);
-                }
+            for (Field field : getCachedFields(getClass())) {
                 Object thisValue = field.get(this);
                 Object otherValue = field.get(o);
                 if (!Objects.equals(thisValue, otherValue)) {
@@ -91,10 +99,7 @@ public abstract class AbstractConfigUnit {
     public int hashCode() {
         List<Object> values = new ArrayList<>();
         try {
-            for (Field field : getClass().getDeclaredFields()) {
-                if (!field.canAccess(this)) {
-                    field.setAccessible(true);
-                }
+            for (Field field : getCachedFields(getClass())) {
                 values.add(field.get(this));
             }
         } catch (IllegalAccessException e) {
@@ -109,10 +114,7 @@ public abstract class AbstractConfigUnit {
         sb.append(getClass().getSimpleName()).append("{");
         try {
             boolean first = true;
-            for (Field field : getClass().getDeclaredFields()) {
-                if (!field.canAccess(this)) {
-                    field.setAccessible(true);
-                }
+            for (Field field : getCachedFields(getClass())) {
                 if (!first) sb.append(", ");
                 sb.append(field.getName()).append("='").append(field.get(this)).append("'");
                 first = false;

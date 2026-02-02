@@ -1,6 +1,6 @@
 package dev.cursedatom.cursedaddons.config.utils;
 
-import dev.cursedatom.cursedaddons.utils.ConfigUtils;
+import dev.cursedatom.cursedaddons.utils.ConfigProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -46,7 +46,7 @@ public class ListManager<T extends AbstractConfigUnit> {
     @SuppressWarnings("unchecked")
     private void loadItems() {
         items = new ArrayList<>();
-        Object listObj = ConfigUtils.get(configKey);
+        Object listObj = ConfigProvider.get(configKey);
         if (listObj instanceof List) {
             try {
                 items = (List<T>) AbstractConfigUnit.fromList((List<Object>) listObj, (Class<T>) unitClass);
@@ -63,7 +63,7 @@ public class ListManager<T extends AbstractConfigUnit> {
                 mapList.add(((AbstractConfigUnit) item).toMap());
             }
         }
-        ConfigUtils.set(configKey, mapList);
+        ConfigProvider.set(configKey, mapList);
     }
 
     public void setSelectedIndex(int index) {

@@ -4,7 +4,8 @@ import dev.cursedatom.cursedaddons.command.CommandRegistry;
 import dev.cursedatom.cursedaddons.config.ConfigScreenGenerator;
 import dev.cursedatom.cursedaddons.features.chatkeybindings.Macro;
 import dev.cursedatom.cursedaddons.features.doublechatfix.DoubleChatFix;
-import dev.cursedatom.cursedaddons.utils.ConfigUtils;
+import dev.cursedatom.cursedaddons.features.images.ImageHoverPreview;
+import dev.cursedatom.cursedaddons.utils.ConfigProvider;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
@@ -18,20 +19,23 @@ public class CursedAddonsClient implements ClientModInitializer {
 	private static boolean macroEnabled = false;
 
 	private static void updateCachedConfig() {
-		Object enabled = ConfigUtils.get("chatkeybindings.Macro.Enabled");
+		Object enabled = ConfigProvider.get("chatkeybindings.Macro.Enabled");
 		macroEnabled = enabled != null && (boolean) enabled;
 	}
 
 	@Override
 	public void onInitializeClient() {
-		ConfigUtils.init();
+		ConfigProvider.init();
 		CommandRegistry.register();
         DoubleChatFix.init();
+        ImageHoverPreview.init();
 
         // Cache initial config state
         updateCachedConfig();
 
-		ClientTickEvents.START_CLIENT_TICK.register(client -> {
+        ClientTickEvents.START_CLIENT_TICK.register(client -> {
+            // Update cached config periodically to reflect changes
+            updateCachedConfig();
             if (macroEnabled) {
                 Macro.tick();
             }

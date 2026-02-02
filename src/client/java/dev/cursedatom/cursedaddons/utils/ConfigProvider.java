@@ -2,7 +2,7 @@ package dev.cursedatom.cursedaddons.utils;
 
 import dev.cursedatom.cursedaddons.config.utils.ConfigStorage;
 
-public class ConfigUtils {
+public class ConfigProvider {
     public static ConfigStorage DEFAULT_CONFIG;
     public static ConfigStorage CONFIG;
 

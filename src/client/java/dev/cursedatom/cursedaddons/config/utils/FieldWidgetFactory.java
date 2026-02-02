@@ -61,13 +61,17 @@ public class FieldWidgetFactory {
     }
 
     private static AbstractWidget createKeybindWidget(FieldDefinition fieldDef, int x, int y, int width, int height, Object initialValue) {
+        return createKeybindWidget(fieldDef, x, y, width, height, initialValue, button -> {
+            // Default empty callback - caller should provide their own
+        });
+    }
+
+    public static KeybindButton createKeybindWidget(FieldDefinition fieldDef, int x, int y, int width, int height, Object initialValue, Button.OnPress onPress) {
         InputConstants.Key initialKey = InputConstants.UNKNOWN;
         if (initialValue instanceof String) {
             initialKey = InputConstants.getKey((String) initialValue);
         }
-        return new KeybindButton(x, y, width, height, initialKey, button -> {
-            // Keybind waiting logic handled by KeybindButton
-        });
+        return new KeybindButton(x, y, width, height, initialKey, onPress);
     }
 
     private static AbstractWidget createCycleWidget(FieldDefinition fieldDef, int x, int y, int width, int height, Object initialValue) {

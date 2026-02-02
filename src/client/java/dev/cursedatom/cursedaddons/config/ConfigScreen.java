@@ -6,7 +6,7 @@ import dev.cursedatom.cursedaddons.config.utils.ListManager;
 import dev.cursedatom.cursedaddons.config.utils.GenericEditScreen;
 import dev.cursedatom.cursedaddons.config.utils.Category;
 import dev.cursedatom.cursedaddons.config.utils.ConfigItem;
-import dev.cursedatom.cursedaddons.utils.ConfigUtils;
+import dev.cursedatom.cursedaddons.utils.ConfigProvider;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -27,6 +27,8 @@ public class ConfigScreen extends Screen {
     private ListManager<SpecialUnits.MacroUnit> macroManager;
     private ListManager<SpecialUnits.AliasUnit> aliasManager;
     private ListManager<SpecialUnits.NotificationUnit> notificationManager;
+    private ListManager<SpecialUnits.WhitelistUnit> whitelistManager;
+    private Button openWhitelistButton;
 
     public ConfigScreen(Screen parent) {
         super(trans("gui.title"));
@@ -62,6 +64,15 @@ public class ConfigScreen extends Screen {
             this::formatNotificationTooltip,
             item -> this.minecraft.setScreen(new GenericEditScreen(this, item, notificationManager.getSelectedIndex(), SpecialUnits.NotificationUnit.class)),
             (item, index) -> onUnitSaved(item, index, SpecialUnits.NotificationUnit.class)
+        );
+
+        whitelistManager = new ListManager<>(
+            "general.ImageHoverPreview.Whitelist",
+            SpecialUnits.WhitelistUnit.class,
+            this::formatWhitelistDisplay,
+            this::formatWhitelistTooltip,
+            item -> this.minecraft.setScreen(new GenericEditScreen(this, item, whitelistManager.getSelectedIndex(), SpecialUnits.WhitelistUnit.class)),
+            (item, index) -> onWhitelistSaved(item, index)
         );
     }
 
@@ -129,7 +140,20 @@ public class ConfigScreen extends Screen {
         if ("chatkeybindings.Macro.List".equals(key)) return SpecialUnits.MacroUnit.class;
         if ("commandaliases.Aliases.List".equals(key)) return SpecialUnits.AliasUnit.class;
         if ("chatnotifications.Notifications.List".equals(key)) return SpecialUnits.NotificationUnit.class;
+        if ("general.ImageHoverPreview.Whitelist".equals(key)) return SpecialUnits.WhitelistUnit.class;
         return null;
+    }
+
+    private String formatWhitelistDisplay(SpecialUnits.WhitelistUnit whitelist) {
+        return whitelist.domain;
+    }
+
+    private String formatWhitelistTooltip(SpecialUnits.WhitelistUnit whitelist) {
+        return "§7Domain: §f" + whitelist.domain;
+    }
+
+    private void onWhitelistSaved(SpecialUnits.WhitelistUnit unit, int index) {
+        // Whitelist items are saved directly through the manager
     }
 
 
@@ -183,17 +207,26 @@ public class ConfigScreen extends Screen {
                 String key = item.getKey();
 
                 if ("boolean".equals(type)) {
-                    boolean value = (boolean) ConfigUtils.get(key);
+                    boolean value = (boolean) ConfigProvider.get(key);
                     String label = item.getLabelKey() != null ? trans(item.getLabelKey()).getString() : trans(key).getString();
                     this.addRenderableWidget(Button.builder(
                         Component.literal(label + ": " + (value ? "§aON" : "§cOFF")),
                         button -> {
-                            ConfigUtils.set(key, !value);
+                            ConfigProvider.set(key, !value);
                             this.clearWidgets();
                             this.init();
                         }).bounds(centerX, contentY, buttonWidth, buttonHeight).build());
                     contentY += 25;
-                } else if ("list".equals(type)) {
+                } else if ("button".equals(type)) {
+                    // Handle button type
+                    String buttonLabel = item.getLabelKey() != null ? trans(item.getLabelKey()).getString() : trans(key).getString();
+                    openWhitelistButton = Button.builder(Component.literal(buttonLabel), button -> {
+                        // Open the whitelist editor
+                        this.minecraft.setScreen(new WhitelistScreen(this));
+                    }).bounds(centerX, contentY, buttonWidth, buttonHeight).build();
+                    this.addRenderableWidget(openWhitelistButton);
+                    contentY += 25;
+                } else if ("list".equals(type) && !item.isHidden()) {
                     Class<?> unitClass = getUnitClassForList(key);
                     if (unitClass != null) {
                         addListManagement(contentY, centerX, buttonWidth, buttonHeight, key, unitClass);
@@ -206,7 +239,7 @@ public class ConfigScreen extends Screen {
 
         // Done button at the bottom
         this.addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> {
-            ConfigUtils.save();
+            ConfigProvider.save();
             this.onClose();
         }).bounds(centerX, this.height - 40, buttonWidth, buttonHeight).build());
     }
@@ -224,6 +257,8 @@ public class ConfigScreen extends Screen {
             widgets = aliasManager.getScrollableListWidgets(this.minecraft, startY, centerX, buttonWidth, buttonHeight, refreshScreen);
         } else if (unitClass == SpecialUnits.NotificationUnit.class) {
             widgets = notificationManager.getScrollableListWidgets(this.minecraft, startY, centerX, buttonWidth, buttonHeight, refreshScreen);
+        } else if (unitClass == SpecialUnits.WhitelistUnit.class) {
+            widgets = whitelistManager.getScrollableListWidgets(this.minecraft, startY, centerX, buttonWidth, buttonHeight, refreshScreen);
         } else {
             return;
         }
