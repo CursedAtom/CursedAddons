@@ -1,3 +1,28 @@
+## [1.0.2] - 2026-02-01
+
+### What's New
+```diff
++ Image Hover Preview: Preview images directly in chat by hovering over URLs
+  - Supports PNG, JPG, JPEG, GIF, and WebP formats
+  - Domain whitelist for security (only shows images from trusted domains)
+  - GIF animation support
++ New fakechat command: Send formatted chat messages with tellraw syntax
+  - Supports colors, click events, hover events, and selectors
+  - Usage: `/cursedaddons fakechat <json>`
+    - Example: `/cursedaddons fakechat {"text":"Hello","color":"red","click_event":{"action":"open_url","url":"https://example.com"}}`
+```
+
+### Changed
+```diff
+- Removed ClothConfig dependency - no longer required for installation
+- Replaced with custom configuration system
+  - New custom GUI screens for all config features
+  - Improved field editors and list management
+```
+
+### Technical
+- Complete rewrite of configuration system using native Minecraft GUI components
+
 ## [1.0.1] - 2025-12-30
 
 ### What's New
