@@ -6,7 +6,12 @@ import dev.cursedatom.cursedaddons.config.SpecialUnits;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * Utility class for checking key and mouse button state with optional modifier key requirements.
+ */
 public class KeyboardUtils {
+    private KeyboardUtils() {}
+
     public static boolean isKeyPressingWithModifier(String translationKey, SpecialUnits.KeyModifiers modifier) {
         if (InputConstants.UNKNOWN.getName().equals(translationKey)) {
             return false;
@@ -16,7 +21,7 @@ public class KeyboardUtils {
         InputConstants.Key key = InputConstants.getKey(translationKey);
         int keyCode = key.getValue();
 
-        // This check is GREEDY
+        // Require the specified modifier key to be held (returns false if it's not)
         if ((modifier.equals(SpecialUnits.KeyModifiers.ALT) &&
                 !(InputConstants.isKeyDown(window, GLFW.GLFW_KEY_LEFT_ALT) ||
                         InputConstants.isKeyDown(window, GLFW.GLFW_KEY_RIGHT_ALT)))

@@ -2,6 +2,10 @@ package dev.cursedatom.cursedaddons.config.utils;
 
 import java.util.List;
 
+/**
+ * POJO representing a single config item within a {@link Category}, deserialized from {@code config_gui.json}.
+ * An item may be a boolean toggle, a list with editable entries, or hidden.
+ */
 public class ConfigItem {
     private String type;
     private String key;

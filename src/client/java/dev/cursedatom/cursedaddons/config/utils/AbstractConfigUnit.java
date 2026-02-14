@@ -4,6 +4,11 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Base class for all config list entry types (e.g. macros, aliases, notifications).
+ * Uses reflection to serialize and deserialize instances to and from plain {@code Map<String, Object>}
+ * representations suitable for JSON storage. Field arrays are cached to minimize repeated reflection overhead.
+ */
 public abstract class AbstractConfigUnit {
 
     // Cache field arrays to avoid repeated reflection overhead
@@ -22,7 +27,7 @@ public abstract class AbstractConfigUnit {
         });
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings("unchecked")
     public static <T extends AbstractConfigUnit> T of(Object element, Class<T> clazz) {
         if (element instanceof Map) {
             Map<String, Object> map = (Map<String, Object>) element;
@@ -30,10 +35,11 @@ public abstract class AbstractConfigUnit {
                 T instance = clazz.getDeclaredConstructor().newInstance();
                 for (Field field : getCachedFields(clazz)) {
                     String fieldName = field.getName();
-                    Object value = map.getOrDefault(fieldName, getDefaultValue(field));
+                    if (!map.containsKey(fieldName)) continue;
+                    Object value = map.get(fieldName);
                     if (value != null) {
                         if (field.getType().isEnum() && value instanceof String) {
-                            // Handle enum deserialization
+                            @SuppressWarnings({"unchecked", "rawtypes"})
                             Enum<?> enumValue = (Enum<?>) Enum.valueOf((Class<? extends Enum>) field.getType(), (String) value);
                             field.set(instance, enumValue);
                         } else {
@@ -124,16 +130,5 @@ public abstract class AbstractConfigUnit {
         }
         sb.append("}");
         return sb.toString();
-    }
-
-    private static Object getDefaultValue(Field field) {
-        Class<?> type = field.getType();
-        if (type == boolean.class) return false;
-        if (type == int.class) return 0;
-        if (type == long.class) return 0L;
-        if (type == double.class) return 0.0;
-        if (type == float.class) return 0.0f;
-        if (type == String.class) return "";
-        return null;
     }
 }

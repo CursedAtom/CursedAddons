@@ -11,6 +11,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Mixin for {@link net.minecraft.client.multiplayer.ClientPacketListener} that hooks into
+ * all incoming chat packet types to trigger {@link dev.cursedatom.cursedaddons.features.chatnotifications.ChatNotifications}.
+ */
 @Mixin(ClientPacketListener.class)
 public abstract class ClientPacketListenerMixin {
 

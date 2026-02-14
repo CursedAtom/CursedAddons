@@ -2,6 +2,10 @@ package dev.cursedatom.cursedaddons.features.images;
 
 import net.minecraft.resources.ResourceLocation;
 
+/**
+ * Container for image hover data used by {@link dev.cursedatom.cursedaddons.mixin.client.DrawContextMixin}
+ * to render image tooltip overlays.
+ */
 public final class ImageHoverEvent {
 
     private ImageHoverEvent() {

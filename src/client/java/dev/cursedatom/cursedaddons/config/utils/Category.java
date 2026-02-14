@@ -2,6 +2,9 @@ package dev.cursedatom.cursedaddons.config.utils;
 
 import java.util.List;
 
+/**
+ * POJO representing a top-level tab category in the config GUI, deserialized from {@code config_gui.json}.
+ */
 public class Category {
     private String nameKey;
     private List<ConfigItem> content;

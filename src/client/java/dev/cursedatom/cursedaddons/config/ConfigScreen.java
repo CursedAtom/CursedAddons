@@ -14,21 +14,35 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import com.mojang.blaze3d.platform.InputConstants;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 import static dev.cursedatom.cursedaddons.utils.TextUtils.trans;
 
+/**
+ * Main config screen for CursedAddons, rendered as a tabbed UI with scrollable list managers
+ * for each feature's configurable item lists.
+ *
+ * <p>Minecraft section-sign (§) color codes used in format methods:
+ * §b = aqua (label), §f = white (value), §d = light purple (command/accent),
+ * §e = yellow (sound), §9 = blue (title), §7 = gray (subdued label).
+ */
 public class ConfigScreen extends Screen {
+    private static final int TAB_WIDTH = 120;
+    private static final int TAB_HEIGHT = 20;
+    private static final int TAB_Y = 30;
+    private static final int BUTTON_WIDTH = 200;
+    private static final int BUTTON_HEIGHT = 20;
+    private static final int BG_COLOR = 0xAA000000;
+    private static final int BG_WIDTH = 640;
+
     private final Screen parent;
     private final ConfigGui configGui;
     private String selectedCategory;
 
-    // List managers for different unit types
-    private ListManager<SpecialUnits.MacroUnit> macroManager;
-    private ListManager<SpecialUnits.AliasUnit> aliasManager;
-    private ListManager<SpecialUnits.NotificationUnit> notificationManager;
-    private ListManager<SpecialUnits.WhitelistUnit> whitelistManager;
-    private Button openWhitelistButton;
+    private final Map<String, ListManager<?>> managers = new LinkedHashMap<>();
 
     public ConfigScreen(Screen parent) {
         super(trans("gui.title"));
@@ -38,42 +52,26 @@ public class ConfigScreen extends Screen {
         initializeListManagers();
     }
 
+    @SuppressWarnings("unchecked")
+    private <T extends AbstractConfigUnit> void registerManager(String configKey, Class<T> unitClass,
+            Function<T, String> displayFmt, Function<T, String> tooltipFmt) {
+        ListManager<T>[] managerRef = new ListManager[1]; // capture for lambda
+        managerRef[0] = new ListManager<>(
+            configKey, unitClass, displayFmt, tooltipFmt,
+            item -> this.minecraft.setScreen(new GenericEditScreen(this, item, managerRef[0].getSelectedIndex(), unitClass))
+        );
+        managers.put(configKey, managerRef[0]);
+    }
+
     private void initializeListManagers() {
-        macroManager = new ListManager<>(
-            "chatkeybindings.Macro.List",
-            SpecialUnits.MacroUnit.class,
-            this::formatMacroDisplay,
-            this::formatMacroTooltip,
-            item -> this.minecraft.setScreen(new GenericEditScreen(this, item, macroManager.getSelectedIndex(), SpecialUnits.MacroUnit.class)),
-            (item, index) -> onUnitSaved(item, index, SpecialUnits.MacroUnit.class)
-        );
-
-        aliasManager = new ListManager<>(
-            "commandaliases.Aliases.List",
-            SpecialUnits.AliasUnit.class,
-            this::formatAliasDisplay,
-            this::formatAliasTooltip,
-            item -> this.minecraft.setScreen(new GenericEditScreen(this, item, aliasManager.getSelectedIndex(), SpecialUnits.AliasUnit.class)),
-            (item, index) -> onUnitSaved(item, index, SpecialUnits.AliasUnit.class)
-        );
-
-        notificationManager = new ListManager<>(
-            "chatnotifications.Notifications.List",
-            SpecialUnits.NotificationUnit.class,
-            this::formatNotificationDisplay,
-            this::formatNotificationTooltip,
-            item -> this.minecraft.setScreen(new GenericEditScreen(this, item, notificationManager.getSelectedIndex(), SpecialUnits.NotificationUnit.class)),
-            (item, index) -> onUnitSaved(item, index, SpecialUnits.NotificationUnit.class)
-        );
-
-        whitelistManager = new ListManager<>(
-            "general.ImageHoverPreview.Whitelist",
-            SpecialUnits.WhitelistUnit.class,
-            this::formatWhitelistDisplay,
-            this::formatWhitelistTooltip,
-            item -> this.minecraft.setScreen(new GenericEditScreen(this, item, whitelistManager.getSelectedIndex(), SpecialUnits.WhitelistUnit.class)),
-            (item, index) -> onWhitelistSaved(item, index)
-        );
+        registerManager(ConfigKeys.MACRO_LIST, SpecialUnits.MacroUnit.class,
+            this::formatMacroDisplay, this::formatMacroTooltip);
+        registerManager(ConfigKeys.ALIASES_LIST, SpecialUnits.AliasUnit.class,
+            this::formatAliasDisplay, this::formatAliasTooltip);
+        registerManager(ConfigKeys.NOTIFICATIONS_LIST, SpecialUnits.NotificationUnit.class,
+            this::formatNotificationDisplay, this::formatNotificationTooltip);
+        registerManager(ConfigKeys.IMAGE_WHITELIST, SpecialUnits.WhitelistUnit.class,
+            this::formatWhitelistDisplay, this::formatWhitelistTooltip);
     }
 
     private String formatMacroDisplay(SpecialUnits.MacroUnit macro) {
@@ -129,34 +127,21 @@ public class ConfigScreen extends Screen {
         return tooltip.toString();
     }
 
+    private String formatWhitelistDisplay(SpecialUnits.WhitelistUnit whitelist) {
+        String embedTag = whitelist.resolveEmbed ? " §b[EMBED]§r" : "";
+        return whitelist.domain + embedTag;
+    }
+
+    private String formatWhitelistTooltip(SpecialUnits.WhitelistUnit whitelist) {
+        return "§7Domain: §f" + whitelist.domain + "\n§bResolve Embed: §f" + (whitelist.resolveEmbed ? "Yes" : "No");
+    }
+
     private void initializeSelectedCategory() {
         List<Category> categories = configGui.getCategories();
         if (categories != null && !categories.isEmpty()) {
             selectedCategory = trans(categories.get(0).getNameKey()).getString();
         }
     }
-
-    private Class<?> getUnitClassForList(String key) {
-        if ("chatkeybindings.Macro.List".equals(key)) return SpecialUnits.MacroUnit.class;
-        if ("commandaliases.Aliases.List".equals(key)) return SpecialUnits.AliasUnit.class;
-        if ("chatnotifications.Notifications.List".equals(key)) return SpecialUnits.NotificationUnit.class;
-        if ("general.ImageHoverPreview.Whitelist".equals(key)) return SpecialUnits.WhitelistUnit.class;
-        return null;
-    }
-
-    private String formatWhitelistDisplay(SpecialUnits.WhitelistUnit whitelist) {
-        return whitelist.domain;
-    }
-
-    private String formatWhitelistTooltip(SpecialUnits.WhitelistUnit whitelist) {
-        return "§7Domain: §f" + whitelist.domain;
-    }
-
-    private void onWhitelistSaved(SpecialUnits.WhitelistUnit unit, int index) {
-        // Whitelist items are saved directly through the manager
-    }
-
-
 
     @Override
     protected void init() {
@@ -166,10 +151,7 @@ public class ConfigScreen extends Screen {
         if (categories == null) return;
 
         // Tab buttons at the top
-        int tabWidth = 120;
-        int tabHeight = 20;
-        int startX = this.width / 2 - (categories.size() * tabWidth) / 2;
-        int tabY = 30;
+        int startX = this.width / 2 - (categories.size() * TAB_WIDTH) / 2;
 
         for (int i = 0; i < categories.size(); i++) {
             final Category category = categories.get(i);
@@ -179,7 +161,7 @@ public class ConfigScreen extends Screen {
                 selectedCategory = categoryName;
                 this.clearWidgets();
                 this.init();
-            }).bounds(startX + i * tabWidth, tabY, tabWidth, tabHeight).build();
+            }).bounds(startX + i * TAB_WIDTH, TAB_Y, TAB_WIDTH, TAB_HEIGHT).build();
 
             if (isSelected) {
                 tabButton.setMessage(Component.literal("§6§l[§r " + tabButton.getMessage().getString() + " §6§l]§r"));
@@ -189,10 +171,8 @@ public class ConfigScreen extends Screen {
         }
 
         // Content area below tabs
-        int contentY = tabY + tabHeight + 20;
-        int buttonWidth = 200;
-        int buttonHeight = 20;
-        int centerX = this.width / 2 - buttonWidth / 2;
+        int contentY = TAB_Y + TAB_HEIGHT + 20;
+        int centerX = this.width / 2 - BUTTON_WIDTH / 2;
 
         // Find selected category and add content
         for (Category category : categories) {
@@ -207,7 +187,7 @@ public class ConfigScreen extends Screen {
                 String key = item.getKey();
 
                 if ("boolean".equals(type)) {
-                    boolean value = (boolean) ConfigProvider.get(key);
+                    boolean value = ConfigProvider.getBoolean(key, false);
                     String label = item.getLabelKey() != null ? trans(item.getLabelKey()).getString() : trans(key).getString();
                     this.addRenderableWidget(Button.builder(
                         Component.literal(label + ": " + (value ? "§aON" : "§cOFF")),
@@ -215,22 +195,13 @@ public class ConfigScreen extends Screen {
                             ConfigProvider.set(key, !value);
                             this.clearWidgets();
                             this.init();
-                        }).bounds(centerX, contentY, buttonWidth, buttonHeight).build());
-                    contentY += 25;
-                } else if ("button".equals(type)) {
-                    // Handle button type
-                    String buttonLabel = item.getLabelKey() != null ? trans(item.getLabelKey()).getString() : trans(key).getString();
-                    openWhitelistButton = Button.builder(Component.literal(buttonLabel), button -> {
-                        // Open the whitelist editor
-                        this.minecraft.setScreen(new WhitelistScreen(this));
-                    }).bounds(centerX, contentY, buttonWidth, buttonHeight).build();
-                    this.addRenderableWidget(openWhitelistButton);
+                        }).bounds(centerX, contentY, BUTTON_WIDTH, BUTTON_HEIGHT).build());
                     contentY += 25;
                 } else if ("list".equals(type) && !item.isHidden()) {
-                    Class<?> unitClass = getUnitClassForList(key);
-                    if (unitClass != null) {
-                        addListManagement(contentY, centerX, buttonWidth, buttonHeight, key, unitClass);
-                        contentY += 200; // Estimate for list height
+                    ListManager<?> manager = managers.get(key);
+                    if (manager != null) {
+                        addListManagement(contentY, centerX, manager);
+                        contentY += 200;
                     }
                 }
             }
@@ -241,54 +212,41 @@ public class ConfigScreen extends Screen {
         this.addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> {
             ConfigProvider.save();
             this.onClose();
-        }).bounds(centerX, this.height - 40, buttonWidth, buttonHeight).build());
+        }).bounds(centerX, this.height - 40, BUTTON_WIDTH, BUTTON_HEIGHT).build());
     }
 
-    private void addListManagement(int startY, int centerX, int buttonWidth, int buttonHeight, String configKey, Class<?> unitClass) {
+    private void addListManagement(int startY, int centerX, ListManager<?> manager) {
         Runnable refreshScreen = () -> {
             this.clearWidgets();
             this.init();
         };
 
-        List<AbstractWidget> widgets;
-        if (unitClass == SpecialUnits.MacroUnit.class) {
-            widgets = macroManager.getScrollableListWidgets(this.minecraft, startY, centerX, buttonWidth, buttonHeight, refreshScreen);
-        } else if (unitClass == SpecialUnits.AliasUnit.class) {
-            widgets = aliasManager.getScrollableListWidgets(this.minecraft, startY, centerX, buttonWidth, buttonHeight, refreshScreen);
-        } else if (unitClass == SpecialUnits.NotificationUnit.class) {
-            widgets = notificationManager.getScrollableListWidgets(this.minecraft, startY, centerX, buttonWidth, buttonHeight, refreshScreen);
-        } else if (unitClass == SpecialUnits.WhitelistUnit.class) {
-            widgets = whitelistManager.getScrollableListWidgets(this.minecraft, startY, centerX, buttonWidth, buttonHeight, refreshScreen);
-        } else {
-            return;
-        }
-
+        List<AbstractWidget> widgets = manager.getScrollableListWidgets(this.minecraft, startY, centerX, BUTTON_WIDTH, BUTTON_HEIGHT, refreshScreen);
         for (AbstractWidget widget : widgets) {
             this.addRenderableWidget(widget);
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void onUnitSaved(AbstractConfigUnit unit, int index, Class<?> unitClass) {
-        if (unitClass == SpecialUnits.MacroUnit.class) {
-            macroManager.saveItem((SpecialUnits.MacroUnit) unit, index);
-        } else if (unitClass == SpecialUnits.AliasUnit.class) {
-            aliasManager.saveItem((SpecialUnits.AliasUnit) unit, index);
-        } else if (unitClass == SpecialUnits.NotificationUnit.class) {
-            notificationManager.saveItem((SpecialUnits.NotificationUnit) unit, index);
+        String configKey = UnitTypeRegistry.getConfigKey(unitClass);
+        if (configKey != null) {
+            ListManager<AbstractConfigUnit> manager = (ListManager<AbstractConfigUnit>) managers.get(configKey);
+            if (manager != null) {
+                manager.saveItem(unit, index);
+            }
         }
     }
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        // Draw semi-transparent black background (darkens the screen)
-        guiGraphics.fill(0, 0, this.width, this.height, 0xAA000000);
+        // Two overlapping fills: first darkens the entire screen, second marks the config panel bounds.
+        guiGraphics.fill(0, 0, this.width, this.height, BG_COLOR);
 
-        // Draw overlayed slightly darker background for the config area (shows bounds of the config window)
-        int bgX = this.width / 2 - 250;
+        int bgX = this.width / 2 - BG_WIDTH / 2;
         int bgY = 20;
-        int bgWidth = 500;
         int bgHeight = this.height - 40;
-        guiGraphics.fill(bgX, bgY, bgX + bgWidth, bgY + bgHeight, 0xAA000000);
+        guiGraphics.fill(bgX, bgY, bgX + BG_WIDTH, bgY + bgHeight, BG_COLOR);
     }
 
     @Override

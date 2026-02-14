@@ -1,106 +1,193 @@
 package dev.cursedatom.cursedaddons.features.images;
 
-import dev.cursedatom.cursedaddons.utils.LoggerUtils;
+import dev.cursedatom.cursedaddons.config.ConfigKeys;
+import dev.cursedatom.cursedaddons.utils.ConfigProvider;
+import dev.cursedatom.cursedaddons.CursedAddons;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Asynchronously fetches and caches images (static and GIF) from whitelisted URLs.
+ * Applies SSRF protection, file-size limiting, and LRU eviction up to {@code MAX_CACHE_SIZE} entries.
+ */
 public class ImageCache {
+    private ImageCache() {}
     private static final int MAX_CACHE_SIZE = 10;
+    private static final int CONNECT_TIMEOUT_MS = 5_000;
+    private static final int READ_TIMEOUT_MS = 10_000;
+    private static final int DEFAULT_MAX_FILE_SIZE_MB = 30;
+
+    private static int getMaxContentLength() {
+        Object value = ConfigProvider.get(ConfigKeys.IMAGE_MAX_FILE_SIZE_MB);
+        int mb = (value instanceof Number) ? ((Number) value).intValue() : DEFAULT_MAX_FILE_SIZE_MB;
+        return Math.max(mb, 1) * 1024 * 1024;
+    }
+
+    private static final Object cacheLock = new Object();
     private static final Map<String, CacheEntry> cache = new LinkedHashMap<>(MAX_CACHE_SIZE, 0.75f, true) {
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, CacheEntry> eldest) {
-            return size() > MAX_CACHE_SIZE;
+            if (size() > MAX_CACHE_SIZE) {
+                String evictedKey = eldest.getKey();
+                ImageTextureManager.scheduleTextureRemoval(evictedKey);
+                return true;
+            }
+            return false;
         }
     };
 
     private static final Map<String, CompletableFuture<ImageResult>> loadingTasks = new ConcurrentHashMap<>();
-    private static final Map<String, Long> failedUrls = new ConcurrentHashMap<>();
-    private static final long RETRY_DELAY_MS = 30_000; // Wait 30 seconds before retrying a failed URL
+    private static final Map<String, FailureEntry> failedUrls = new ConcurrentHashMap<>();
+    private static final long RETRY_DELAY_MS = 30_000;
 
     public static CompletableFuture<ImageResult> loadImage(String url, int maxWidth, int maxHeight) {
         String cacheKey = getCacheKey(url, maxWidth, maxHeight);
 
-        // Check if this URL recently failed — don't retry until the cooldown expires
-        Long failedAt = failedUrls.get(cacheKey);
-        if (failedAt != null) {
-            if (System.currentTimeMillis() - failedAt < RETRY_DELAY_MS) {
+        FailureEntry failure = failedUrls.get(cacheKey);
+        if (failure != null) {
+            if (System.currentTimeMillis() - failure.timestamp < RETRY_DELAY_MS) {
                 return CompletableFuture.completedFuture(null);
             }
             failedUrls.remove(cacheKey);
         }
 
-        // Check if already loading
-        CompletableFuture<ImageResult> existing = loadingTasks.get(cacheKey);
-        if (existing != null) {
-            return existing;
-        }
-
-        // Check cache
-        CacheEntry entry = cache.get(cacheKey);
-        if (entry != null) {
-            return CompletableFuture.completedFuture(entry.result);
-        }
-
-        // Start loading
-        CompletableFuture<ImageResult> future = new CompletableFuture<>();
-        loadingTasks.put(cacheKey, future);
-
-        CompletableFuture.runAsync(() -> {
-            try {
-                ImageResult result;
-                if (isGifUrl(url)) {
-                    result = loadGif(url, maxWidth, maxHeight);
-                } else {
-                    result = loadStatic(url, maxWidth, maxHeight);
-                }
-                cache.put(cacheKey, new CacheEntry(result));
-                future.complete(result);
-            } catch (Exception e) {
-                LoggerUtils.error("[ImageHoverPreview] Failed to load image from " + url + ": " + e.getMessage());
-                failedUrls.put(cacheKey, System.currentTimeMillis());
-                future.completeExceptionally(e);
-            } finally {
-                loadingTasks.remove(cacheKey);
+        synchronized (cacheLock) {
+            CacheEntry entry = cache.get(cacheKey);
+            if (entry != null) {
+                return CompletableFuture.completedFuture(entry.result);
             }
-        });
+        }
 
-        return future;
+        return loadingTasks.computeIfAbsent(cacheKey, key -> {
+            CompletableFuture<ImageResult> future = new CompletableFuture<>();
+            CompletableFuture.runAsync(() -> {
+                try {
+                    // Resolve embed URLs (e.g. imgur.com/abc -> i.imgur.com/abc.jpg)
+                    String loadUrl = url;
+                    if (ImageHoverPreview.isEmbedResolutionEnabledForUrl(url) && ImageHoverPreview.needsResolution(url)) {
+                        String resolved = UrlResolver.resolve(url);
+                        if (resolved == null) {
+                            throw new Exception("Failed to resolve embed URL");
+                        }
+                        if (!ImageHoverPreview.isWhitelisted(resolved)) {
+                            throw new Exception("Domain not whitelisted");
+                        }
+                        loadUrl = resolved;
+                    }
+
+                    ImageResult result;
+                    if (isGifUrl(loadUrl)) {
+                        result = loadGif(loadUrl, maxWidth, maxHeight);
+                    } else {
+                        result = loadStatic(loadUrl, maxWidth, maxHeight);
+                    }
+                    synchronized (cacheLock) {
+                        cache.put(cacheKey, new CacheEntry(result));
+                    }
+                    future.complete(result);
+                } catch (Exception e) {
+                    CursedAddons.LOGGER.error("[ImageHoverPreview] Failed to load image from " + url + ": " + e.getMessage());
+                    failedUrls.put(cacheKey, new FailureEntry(System.currentTimeMillis(), e.getMessage()));
+                    future.completeExceptionally(e);
+                } finally {
+                    loadingTasks.remove(cacheKey);
+                }
+            });
+            return future;
+        });
     }
 
-    private static String getCacheKey(String url, int maxWidth, int maxHeight) {
+    /**
+     * Returns the failure reason for a cached failed URL, or null if not failed.
+     */
+    public static String getFailureReason(String url, int maxWidth, int maxHeight) {
+        String cacheKey = getCacheKey(url, maxWidth, maxHeight);
+        FailureEntry failure = failedUrls.get(cacheKey);
+        if (failure != null && System.currentTimeMillis() - failure.timestamp < RETRY_DELAY_MS) {
+            return failure.reason;
+        }
+        return null;
+    }
+
+    // Cache keys follow the pattern "url@WxH" to separate entries for different display sizes.
+    static String getCacheKey(String url, int maxWidth, int maxHeight) {
         return url + "@" + maxWidth + "x" + maxHeight;
     }
 
+    private static InputStream openConnectionWithTimeouts(String url) throws Exception {
+        URI uri = new URI(url);
+        // SSRF check BEFORE connecting
+        InetAddress address = InetAddress.getByName(uri.toURL().getHost());
+        if (address.isLoopbackAddress() || address.isSiteLocalAddress() || address.isLinkLocalAddress()) {
+            throw new Exception("Blocked address");
+        }
+
+        HttpURLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) uri.toURL().openConnection();
+            connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
+            connection.setReadTimeout(READ_TIMEOUT_MS);
+            connection.setInstanceFollowRedirects(false);
+            connection.setRequestProperty("Accept", "image/*");
+            connection.connect();
+
+            int responseCode = connection.getResponseCode();
+
+            // Reject redirects — the whitelist validated the original host, not the redirect target
+            if (responseCode >= 300 && responseCode < 400) {
+                throw new Exception("HTTP " + responseCode);
+            }
+
+            if (responseCode != 200) {
+                throw new Exception("HTTP " + responseCode);
+            }
+
+            int contentLength = connection.getContentLength();
+            if (contentLength > getMaxContentLength()) {
+                throw new Exception("File too large (" + (contentLength / 1024 / 1024) + "MB / " + (getMaxContentLength() / 1024 / 1024) + "MB max)");
+            }
+
+            return new BoundedInputStream(connection.getInputStream(), getMaxContentLength());
+        } catch (Exception e) {
+            if (connection != null) connection.disconnect();
+            throw e;
+        }
+    }
+
     private static ImageResult loadStatic(String url, int maxWidth, int maxHeight) throws Exception {
-        BufferedImage image = ImageIO.read(new URI(url).toURL());
+        BufferedImage image;
+        try (InputStream stream = openConnectionWithTimeouts(url)) {
+            image = ImageIO.read(stream);
+        }
         if (image == null) {
             throw new Exception("Failed to read image");
         }
-        
-        // Scale image if it exceeds max dimensions
+
         BufferedImage processedImage = scaleIfNeeded(image, maxWidth, maxHeight);
-        int w = processedImage.getWidth();
-        int h = processedImage.getHeight();
+        int width = processedImage.getWidth();
+        int height = processedImage.getHeight();
 
-        byte[] pngData = bufferedToPng(processedImage);
+        int[] argbPixels = processedImage.getRGB(0, 0, width, height, null, 0, width);
 
-        // Clean up scaled image if it's different from original
         if (processedImage != image) {
             processedImage.flush();
         }
         image.flush();
 
-        return ImageResult.ofStatic(pngData, w, h);
+        return ImageResult.ofStaticRaw(argbPixels, width, height);
     }
 
     private static BufferedImage scaleIfNeeded(BufferedImage image, int maxWidth, int maxHeight) {
@@ -133,28 +220,19 @@ public class ImageCache {
     }
 
     private static ImageResult loadGif(String url, int maxWidth, int maxHeight) throws Exception {
-        try (InputStream stream = new URI(url).toURL().openStream()) {
+        try (InputStream stream = openConnectionWithTimeouts(url)) {
             GifDecoder.GifData gifData = GifDecoder.decode(stream, maxWidth, maxHeight);
 
-            List<BufferedImage> frames = gifData.getFrames();
-            if (frames.isEmpty()) {
+            List<byte[]> encodedFrames = gifData.getEncodedFrames();
+            if (encodedFrames.isEmpty()) {
                 throw new Exception("GIF has no frames");
             }
 
-            // Single-frame GIF — treat as static
-            if (frames.size() == 1) {
-                BufferedImage frame = frames.get(0);
-                byte[] pngData = bufferedToPng(frame);
-                frame.flush();
-                return ImageResult.ofStatic(pngData, gifData.getWidth(), gifData.getHeight());
+            if (encodedFrames.size() == 1) {
+                return ImageResult.ofStatic(encodedFrames.get(0), gifData.getWidth(), gifData.getHeight());
             }
 
-            // Encode all frames to PNG bytes on this async thread (heavy work)
-            byte[][] framePngData = new byte[frames.size()][];
-            for (int i = 0; i < frames.size(); i++) {
-                framePngData[i] = bufferedToPng(frames.get(i));
-                frames.get(i).flush();
-            }
+            byte[][] framePngData = encodedFrames.toArray(new byte[0][]);
 
             return ImageResult.ofGif(framePngData, gifData.getDelays(),
                                      gifData.getWidth(), gifData.getHeight());
@@ -164,7 +242,7 @@ public class ImageCache {
     /**
      * Encodes a BufferedImage to PNG byte array. CPU-intensive — call from async thread.
      */
-    private static byte[] bufferedToPng(BufferedImage image) throws Exception {
+    static byte[] bufferedToPng(BufferedImage image) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(image, "png", baos);
         return baos.toByteArray();
@@ -178,8 +256,16 @@ public class ImageCache {
     }
 
     public static void clear() {
-        cache.clear();
+        // Cancel all in-flight loading tasks
+        List<CompletableFuture<ImageResult>> futures = new ArrayList<>(loadingTasks.values());
         loadingTasks.clear();
+        for (CompletableFuture<ImageResult> future : futures) {
+            future.cancel(true);
+        }
+
+        synchronized (cacheLock) {
+            cache.clear();
+        }
         failedUrls.clear();
     }
 
@@ -188,6 +274,57 @@ public class ImageCache {
 
         CacheEntry(ImageResult result) {
             this.result = result;
+        }
+    }
+
+    private static class FailureEntry {
+        final long timestamp;
+        final String reason;
+
+        FailureEntry(long timestamp, String reason) {
+            this.timestamp = timestamp;
+            this.reason = reason;
+        }
+    }
+
+    /**
+     * InputStream wrapper that enforces a maximum number of bytes read.
+     */
+    private static class BoundedInputStream extends InputStream {
+        private final InputStream delegate;
+        private final long maxBytes;
+        private long bytesRead;
+
+        BoundedInputStream(InputStream delegate, long maxBytes) {
+            this.delegate = delegate;
+            this.maxBytes = maxBytes;
+        }
+
+        @Override
+        public int read() throws java.io.IOException {
+            if (bytesRead >= maxBytes) {
+                throw new java.io.IOException("File too large (exceeded " + (maxBytes / 1024 / 1024) + "MB limit)");
+            }
+            int b = delegate.read();
+            if (b >= 0) bytesRead++;
+            return b;
+        }
+
+        @Override
+        public int read(byte[] buf, int off, int len) throws java.io.IOException {
+            if (bytesRead >= maxBytes) {
+                throw new java.io.IOException("File too large (exceeded " + (maxBytes / 1024 / 1024) + "MB limit)");
+            }
+            long remaining = maxBytes - bytesRead;
+            int toRead = (int) Math.min(len, remaining);
+            int n = delegate.read(buf, off, toRead);
+            if (n > 0) bytesRead += n;
+            return n;
+        }
+
+        @Override
+        public void close() throws java.io.IOException {
+            delegate.close();
         }
     }
 }

@@ -5,7 +5,13 @@ import dev.cursedatom.cursedaddons.features.doublechatfix.callback.KeyboardKeyPr
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionResult;
 
+/**
+ * Fixes the "double character" bug where opening a chat-related screen (chat, command, inventory search)
+ * causes the activating key character to be typed into the input field. Intercepts the char-typed event
+ * immediately following a chat-open key press and suppresses it.
+ */
 public class DoubleChatFix {
+    private DoubleChatFix() {}
 
     private static boolean cancelNextChar = false;
 

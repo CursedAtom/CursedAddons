@@ -1,5 +1,7 @@
 package dev.cursedatom.cursedaddons.config.utils;
 
+import dev.cursedatom.cursedaddons.CursedAddons;
+import dev.cursedatom.cursedaddons.config.SpecialUnits;
 import dev.cursedatom.cursedaddons.utils.ConfigProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,30 +18,37 @@ import java.lang.reflect.Field;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * Manages a list of {@link AbstractConfigUnit} items backed by a config key, and provides
+ * the scrollable widget set (edit/delete/add buttons + item list) used by {@link dev.cursedatom.cursedaddons.config.ConfigScreen}.
+ */
 public class ListManager<T extends AbstractConfigUnit> {
+    private static final int ACTION_BUTTON_WIDTH = 60;
+    private static final int SPACING = 10;
+    private static final int LIST_WIDTH = 480;
+    private static final int TOGGLE_BUTTON_OFFSET_X = 260;
+    private static final int ROW_HEIGHT = 25;
+
     private final String configKey;
     private final Class<?> unitClass;
     private final Function<T, String> displayFormatter;
     private final Function<T, String> tooltipFormatter;
     private final Consumer<T> onEdit;
-    private final BiConsumer<T, Integer> onSave;
 
     private List<T> items;
     private int selectedIndex = -1;
 
     public ListManager(String configKey, Class<?> unitClass,
                       Function<T, String> displayFormatter, Function<T, String> tooltipFormatter,
-                      Consumer<T> onEdit, BiConsumer<T, Integer> onSave) {
+                      Consumer<T> onEdit) {
         this.configKey = configKey;
         this.unitClass = unitClass;
         this.displayFormatter = displayFormatter;
         this.tooltipFormatter = tooltipFormatter;
         this.onEdit = onEdit;
-        this.onSave = onSave;
         loadItems();
     }
 
@@ -102,78 +111,15 @@ public class ListManager<T extends AbstractConfigUnit> {
         }
     }
 
-    public List<AbstractWidget> getLegacyListWidgets(Minecraft minecraft, int startY, int centerX, int buttonWidth, int buttonHeight, Runnable refreshScreen) {
-        List<AbstractWidget> widgets = new ArrayList<>();
-        int actionButtonWidth = 60;
-        int spacing = 10;
-        int screenCenterX = minecraft.getWindow().getGuiScaledWidth() / 2;
-
-        Button editButton = Button.builder(Component.literal("Edit"), button -> {
-            if (selectedIndex >= 0 && selectedIndex < items.size()) {
-                onEdit.accept(items.get(selectedIndex));
-            }
-        }).bounds(screenCenterX - actionButtonWidth/2, startY, actionButtonWidth, buttonHeight).build();
-        widgets.add(editButton);
-
-        Button deleteButton = Button.builder(Component.literal("Delete"), button -> {
-            if (selectedIndex >= 0 && selectedIndex < items.size()) {
-                removeItem(selectedIndex);
-                selectedIndex = -1;
-                refreshScreen.run();
-            }
-        }).bounds(screenCenterX - actionButtonWidth/2 - actionButtonWidth - spacing, startY, actionButtonWidth, buttonHeight).build();
-        widgets.add(deleteButton);
-
-        Button addButton = Button.builder(Component.literal("Add"), button -> {
-            onEdit.accept(null);
-        }).bounds(screenCenterX - actionButtonWidth/2 + actionButtonWidth + spacing, startY, actionButtonWidth, buttonHeight).build();
-        widgets.add(addButton);
-
-        int y = startY + 40;
-        for (int i = 0; i < items.size(); i++) {
-            final int index = i;
-            T item = items.get(i);
-            String displayText = displayFormatter.apply(item);
-            String tooltipText = tooltipFormatter.apply(item);
-
-            Button.Builder buttonBuilder = Button.builder(Component.literal(displayText), b -> {
-                selectedIndex = index;
-                refreshScreen.run();
-            }).bounds(centerX - 25, y, buttonWidth + 50, buttonHeight);
-
-            if (!tooltipText.isEmpty()) {
-                buttonBuilder.tooltip(Tooltip.create(Component.literal(tooltipText)));
-            }
-
-            Button button = buttonBuilder.build();
-
-            if (i == selectedIndex) {
-                button.setMessage(Component.literal("§6§l>§r " + displayText + " §6§l<§r"));
-            }
-            widgets.add(button);
-
-            Button toggleButton = createToggleButton(item, index, centerX + 235, y, buttonHeight, refreshScreen);
-            if (toggleButton != null) {
-                widgets.add(toggleButton);
-            }
-
-            y += 25;
-        }
-
-        return widgets;
-    }
-
     public List<AbstractWidget> getScrollableListWidgets(Minecraft minecraft, int startY, int centerX, int buttonWidth, int buttonHeight, Runnable refreshScreen) {
         List<AbstractWidget> widgets = new ArrayList<>();
-        int actionButtonWidth = 60;
-        int spacing = 10;
         int screenCenterX = minecraft.getWindow().getGuiScaledWidth() / 2;
 
         Button editButton = Button.builder(Component.literal("Edit"), button -> {
             if (selectedIndex >= 0 && selectedIndex < items.size()) {
                 onEdit.accept(items.get(selectedIndex));
             }
-        }).bounds(screenCenterX - actionButtonWidth/2, startY, actionButtonWidth, buttonHeight).build();
+        }).bounds(screenCenterX - ACTION_BUTTON_WIDTH / 2, startY, ACTION_BUTTON_WIDTH, buttonHeight).build();
         widgets.add(editButton);
 
         Button deleteButton = Button.builder(Component.literal("Delete"), button -> {
@@ -182,22 +128,21 @@ public class ListManager<T extends AbstractConfigUnit> {
                 selectedIndex = -1;
                 refreshScreen.run();
             }
-        }).bounds(screenCenterX - actionButtonWidth/2 - actionButtonWidth - spacing, startY, actionButtonWidth, buttonHeight).build();
+        }).bounds(screenCenterX - ACTION_BUTTON_WIDTH / 2 - ACTION_BUTTON_WIDTH - SPACING, startY, ACTION_BUTTON_WIDTH, buttonHeight).build();
         widgets.add(deleteButton);
 
         Button addButton = Button.builder(Component.literal("Add"), button -> {
             onEdit.accept(null);
-        }).bounds(screenCenterX - actionButtonWidth/2 + actionButtonWidth + spacing, startY, actionButtonWidth, buttonHeight).build();
+        }).bounds(screenCenterX - ACTION_BUTTON_WIDTH / 2 + ACTION_BUTTON_WIDTH + SPACING, startY, ACTION_BUTTON_WIDTH, buttonHeight).build();
         widgets.add(addButton);
 
         // Create scrollable list
-        int listWidth = 480;
-        int listX = minecraft.getWindow().getGuiScaledWidth() / 2 - listWidth / 2;
+        int listX = minecraft.getWindow().getGuiScaledWidth() / 2 - LIST_WIDTH / 2;
         int listTop = startY + 30;
         int listBottom = minecraft.getWindow().getGuiScaledHeight() - 120;
         int listHeight = Math.max(100, listBottom - listTop);
 
-        ConfigList list = new ConfigList(minecraft, listWidth, listHeight, listTop);
+        ConfigList list = new ConfigList(minecraft, LIST_WIDTH, listHeight, listTop);
         list.setPosition(listX, listTop);
 
         for (int i = 0; i < items.size(); i++) {
@@ -226,7 +171,7 @@ public class ListManager<T extends AbstractConfigUnit> {
 
             entry.addButton(displayButton);
 
-            Button toggleButton = createToggleButton(item, index, buttonWidth + 60, 0, buttonHeight, refreshScreen);
+            Button toggleButton = createToggleButton(item, index, buttonWidth + ACTION_BUTTON_WIDTH, 0, buttonHeight, refreshScreen);
             if (toggleButton != null) {
                 entry.addButton(toggleButton);
             }
@@ -245,26 +190,36 @@ public class ListManager<T extends AbstractConfigUnit> {
             boolean enabled = (boolean) enabledField.get(item);
             return Button.builder(Component.literal(enabled ? "§aON" : "§cOFF"), b -> {
                 try {
-                    enabledField.set(item, !enabled);
+                    boolean newEnabled = !enabled;
+                    enabledField.set(item, newEnabled);
+
+                    // Keybind conflict enforcement for macros
+                    if (newEnabled && item instanceof SpecialUnits.MacroUnit) {
+                        SpecialUnits.MacroUnit macro = (SpecialUnits.MacroUnit) item;
+                        for (int i = 0; i < items.size(); i++) {
+                            if (i == index) continue;
+                            T other = items.get(i);
+                            if (other instanceof SpecialUnits.MacroUnit) {
+                                SpecialUnits.MacroUnit otherMacro = (SpecialUnits.MacroUnit) other;
+                                if (otherMacro.enabled
+                                        && otherMacro.key.equals(macro.key)
+                                        && otherMacro.modifier == macro.modifier) {
+                                    otherMacro.enabled = false;
+                                }
+                            }
+                        }
+                    }
+
                     saveItems();
                     refreshScreen.run();
                 } catch (IllegalAccessException e) {
-                    // Ignore
+                    CursedAddons.LOGGER.error("[CursedAddons] Failed to toggle item: " + e.getMessage());
                 }
             }).bounds(x, y, 40, height).build();
         } catch (Exception e) {
+            CursedAddons.LOGGER.error("[CursedAddons] Failed to create toggle button: " + e.getMessage());
             return null;
         }
-    }
-
-    public void onItemSaved(T item, int index) {
-        if (index >= 0 && index < items.size()) {
-            items.set(index, item);
-        } else {
-            items.add(item);
-        }
-        saveItems();
-        onSave.accept(item, index);
     }
 
     public void saveItem(T item, int index) {
@@ -276,10 +231,12 @@ public class ListManager<T extends AbstractConfigUnit> {
         saveItems();
     }
 
-    // Scrollable list classes
+    /**
+     * Scrollable list widget that renders {@link ConfigEntry} rows for each list item.
+     */
     public static class ConfigList extends ContainerObjectSelectionList<ListManager.ConfigEntry> {
         public ConfigList(Minecraft mc, int width, int height, int y) {
-            super(mc, width, height, y, 25);
+            super(mc, width, height, y, ROW_HEIGHT);
             this.centerListVertically = false;
         }
 
@@ -303,6 +260,9 @@ public class ListManager<T extends AbstractConfigUnit> {
         }
     }
 
+    /**
+     * A single row entry in {@link ConfigList} containing a display button and an optional toggle button.
+     */
     public static class ConfigEntry extends ContainerObjectSelectionList.Entry<ListManager.ConfigEntry> {
         private final List<AbstractWidget> children = Lists.newArrayList();
         private final Runnable onSelect;
@@ -320,7 +280,7 @@ public class ListManager<T extends AbstractConfigUnit> {
             // Position buttons relative to this entry
             int buttonY = this.getContentY();
             int displayButtonX = this.getContentX();
-            int toggleButtonX = this.getContentX() + 260;
+            int toggleButtonX = this.getContentX() + TOGGLE_BUTTON_OFFSET_X;
 
             if (!this.children.isEmpty()) {
                 Button displayButton = (Button) this.children.get(0);

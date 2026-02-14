@@ -11,8 +11,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Mixin for {@link net.minecraft.client.KeyboardHandler} that fires the
+ * {@link dev.cursedatom.cursedaddons.features.doublechatfix.callback.KeyboardKeyPressedCallback} and
+ * {@link dev.cursedatom.cursedaddons.features.doublechatfix.callback.KeyboardCharTypedCallback} events.
+ */
 @Mixin(KeyboardHandler.class)
-public class MixinKeyboard {
+public class KeyboardHandlerMixin {
 
     @Inject(method = "keyPress", at = @At("HEAD"), cancellable = true)
     private void onKeyHead(long window, int key, KeyEvent keyEvent, CallbackInfo ci) {

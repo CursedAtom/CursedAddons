@@ -2,6 +2,11 @@ package dev.cursedatom.cursedaddons.config.utils;
 
 import java.util.List;
 
+/**
+ * POJO representing a single editable field definition, deserialized from {@code config_gui.json}.
+ * Used by {@link dev.cursedatom.cursedaddons.config.utils.FieldWidgetFactory} to create the
+ * appropriate widget for each field in a {@link dev.cursedatom.cursedaddons.config.utils.GenericEditScreen}.
+ */
 public class FieldDefinition {
     private String name;
     private String type;
@@ -12,6 +17,7 @@ public class FieldDefinition {
     private Object defaultValue;
     private Integer maxLength;
     private Boolean required;
+    private String dropdown;
 
     public FieldDefinition() {}
 
@@ -85,5 +91,13 @@ public class FieldDefinition {
 
     public void setRequired(Boolean required) {
         this.required = required;
+    }
+
+    public String getDropdown() {
+        return dropdown;
+    }
+
+    public void setDropdown(String dropdown) {
+        this.dropdown = dropdown;
     }
 }

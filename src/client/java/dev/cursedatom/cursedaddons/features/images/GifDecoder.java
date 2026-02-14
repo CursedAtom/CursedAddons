@@ -1,6 +1,6 @@
 package dev.cursedatom.cursedaddons.features.images;
 
-import dev.cursedatom.cursedaddons.utils.LoggerUtils;
+import dev.cursedatom.cursedaddons.CursedAddons;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -20,6 +20,7 @@ import org.w3c.dom.NamedNodeMap;
 /**
  * Decodes GIF files into individual frames with delay information.
  * Handles GIF disposal methods for correct frame compositing.
+ * Frames are encoded to PNG immediately after compositing to reduce peak memory usage.
  */
 public final class GifDecoder {
     private static final int MAX_FRAMES = 200;
@@ -64,7 +65,7 @@ public final class GifDecoder {
             int scaledHeight = (int) (canvasHeight * scale);
             boolean needsScaling = scale < 1.0f;
 
-            List<BufferedImage> frames = new ArrayList<>();
+            List<byte[]> encodedFrames = new ArrayList<>();
             int[] delays = new int[numFrames];
 
             // Canvas for compositing frames (use scaled dimensions if needed)
@@ -142,17 +143,16 @@ public final class GifDecoder {
                     g.drawImage(rawFrame, info.x, info.y, null);
                 }
 
-                // Store the fully composited frame
-                frames.add(copyImage(canvas));
+                // Encode the composited frame to PNG immediately and release the pixel copy
+                encodedFrames.add(ImageCache.bufferedToPng(canvas));
 
                 previousDisposal = info.disposal;
                 previousBounds = new Rectangle(info.x, info.y, rawFrame.getWidth(), rawFrame.getHeight());
             }
 
             g.dispose();
-            reader.dispose();
 
-            return new GifData(frames, delays, scaledWidth, scaledHeight);
+            return new GifData(encodedFrames, delays, scaledWidth, scaledHeight);
         } finally {
             reader.dispose();
         }
@@ -208,7 +208,7 @@ public final class GifDecoder {
                 }
             }
         } catch (Exception e) {
-            LoggerUtils.warn("[GifDecoder] Failed to parse frame metadata: " + e.getMessage());
+            CursedAddons.LOGGER.warn("[GifDecoder] Failed to parse frame metadata: " + e.getMessage());
         }
 
         return new FrameInfo(x, y, delay, disposal);
@@ -230,9 +230,7 @@ public final class GifDecoder {
                     }
                 }
             }
-        } catch (Exception e) {
-            // Ignore — fall back to frame dimensions
-        }
+        } catch (Exception e) {}
         return null;
     }
 
@@ -259,20 +257,20 @@ public final class GifDecoder {
     }
 
     public static class GifData {
-        private final List<BufferedImage> frames;
+        private final List<byte[]> encodedFrames;
         private final int[] delays;
         private final int width;
         private final int height;
 
-        GifData(List<BufferedImage> frames, int[] delays, int width, int height) {
-            this.frames = frames;
+        GifData(List<byte[]> encodedFrames, int[] delays, int width, int height) {
+            this.encodedFrames = encodedFrames;
             this.delays = delays;
             this.width = width;
             this.height = height;
         }
 
-        public List<BufferedImage> getFrames() {
-            return frames;
+        public List<byte[]> getEncodedFrames() {
+            return encodedFrames;
         }
 
         public int[] getDelays() {
@@ -288,7 +286,7 @@ public final class GifDecoder {
         }
 
         public int getFrameCount() {
-            return frames.size();
+            return encodedFrames.size();
         }
 
         public int getTotalDuration() {

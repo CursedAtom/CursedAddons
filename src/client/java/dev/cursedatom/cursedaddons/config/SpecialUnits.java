@@ -6,12 +6,17 @@ import com.mojang.blaze3d.platform.InputConstants;
 import java.util.List;
 
 
+/**
+ * Container for all concrete {@link dev.cursedatom.cursedaddons.config.utils.AbstractConfigUnit} subclasses
+ * used by the mod's list-based config items (macros, aliases, notifications, whitelist entries).
+ */
 public class SpecialUnits {
 
     public enum KeyModifiers {
         SHIFT, ALT, CTRL, NONE
     }
 
+    /** A keybind-to-command macro triggered when the bound key (and optional modifier) is held. */
     public static class MacroUnit extends AbstractConfigUnit {
         public String key;
         public KeyModifiers modifier;
@@ -41,6 +46,7 @@ public class SpecialUnits {
         }
     }
 
+    /** Maps a command alias to its replacement text, applied when the user sends a matching command. */
     public static class AliasUnit extends AbstractConfigUnit {
         public String alias;
         public String replacement;
@@ -67,6 +73,7 @@ public class SpecialUnits {
         }
     }
 
+    /** Triggers sounds, title displays, or commands when an incoming chat message matches a pattern. */
     public static class NotificationUnit extends AbstractConfigUnit {
         public String pattern;
         public boolean regex;
@@ -111,17 +118,21 @@ public class SpecialUnits {
         }
     }
 
+    /** An image preview whitelist entry that allows images from a given domain to be previewed on hover. */
     public static class WhitelistUnit extends AbstractConfigUnit {
         public String domain;
+        public boolean resolveEmbed;
         public boolean enabled;
 
         public WhitelistUnit() {
             this.domain = "";
+            this.resolveEmbed = true;
             this.enabled = true;
         }
 
-        public WhitelistUnit(String domain, boolean enabled) {
+        public WhitelistUnit(String domain, boolean resolveEmbed, boolean enabled) {
             this.domain = domain;
+            this.resolveEmbed = resolveEmbed;
             this.enabled = enabled;
         }
 

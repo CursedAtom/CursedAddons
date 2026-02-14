@@ -1,6 +1,6 @@
 package dev.cursedatom.cursedaddons.features.general;
 
-import dev.cursedatom.cursedaddons.utils.LoggerUtils;
+import dev.cursedatom.cursedaddons.CursedAddons;
 import dev.cursedatom.cursedaddons.utils.TextUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -14,8 +14,14 @@ import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Enriches the hover event of a chat {@link Style} to include a preview of any click event or insertion text.
+ * Appended below any existing hover content so the original tooltip is preserved.
+ */
 public class ClickEventsPreviewer {
-    public static Style work(Style style) {
+    private ClickEventsPreviewer() {}
+
+    public static Style enrichStyleWithPreview(Style style) {
         if (style == null) {
             return null;
         }
@@ -26,32 +32,35 @@ public class ClickEventsPreviewer {
             return style;
         }
         Component textToAppendWithTwoEmptyLinesInFront = TextUtils.literal("\n\n").copy().append(textToAppend);
+
+        // Three cases: (1) no existing hover → set preview directly; (2) existing text hover → append to it;
+        // (3) entity/item hover → extract tooltip lines and append.
         if (hoverEvent == null) {
             style = style.withHoverEvent(new HoverEvent.ShowText(textToAppend));
         } else {
             Component oldHoverComponent = null;
             if (hoverEvent instanceof HoverEvent.ShowText) {
-                 oldHoverComponent = ((HoverEvent.ShowText) hoverEvent).value();
+                oldHoverComponent = ((HoverEvent.ShowText) hoverEvent).value();
             }
-            
+
             if (oldHoverComponent != null && !oldHoverComponent.getString().isBlank()) {
                 Component newHoverComponent = (TextUtils.SPACER.copy().append(oldHoverComponent)).append(textToAppendWithTwoEmptyLinesInFront);
                 style = style.withHoverEvent(new HoverEvent.ShowText(newHoverComponent));
             } else {
-                 HoverEvent.EntityTooltipInfo entityContent = null;
-                 ItemStack itemStack = null;
+                HoverEvent.EntityTooltipInfo entityContent = null;
+                ItemStack itemStack = null;
 
-                 if (hoverEvent instanceof HoverEvent.ShowEntity) {
-                     entityContent = ((HoverEvent.ShowEntity) hoverEvent).entity();
-                 }
-                 if (hoverEvent instanceof HoverEvent.ShowItem) {
-                     itemStack = ((HoverEvent.ShowItem) hoverEvent).item();
-                 }
+                if (hoverEvent instanceof HoverEvent.ShowEntity) {
+                    entityContent = ((HoverEvent.ShowEntity) hoverEvent).entity();
+                }
+                if (hoverEvent instanceof HoverEvent.ShowItem) {
+                    itemStack = ((HoverEvent.ShowItem) hoverEvent).item();
+                }
 
                 if (entityContent != null) {
-                    oldHoverComponent = TextUtils.textArray2text(entityContent.getTooltipLines());
+                    oldHoverComponent = TextUtils.joinComponents(entityContent.getTooltipLines());
                 } else if (itemStack != null) {
-                     oldHoverComponent = TextUtils.textArray2text(
+                    oldHoverComponent = TextUtils.joinComponents(
                             Screen.getTooltipFromItem(Minecraft.getInstance(), itemStack)
                     );
                 }
@@ -127,13 +136,13 @@ public class ClickEventsPreviewer {
                     texts.add(TextUtils.trans("texts.PreviewClickEvents.clickEvent.copyToClipboard", valueComponent));
                     break;
                 default:
-                    LoggerUtils.warn("[CursedAddons] Unknown clickEvent action type: " + action);
+                    CursedAddons.LOGGER.warn("[CursedAddons] Unknown clickEvent action type: " + action);
             }
         }
-        return TextUtils.textArray2text(texts);
+        return TextUtils.joinComponents(texts);
     }
 
-    private static Boolean isModified(Style style) {
+    private static boolean isModified(Style style) {
         HoverEvent hoverEvent = style.getHoverEvent();
         if (hoverEvent == null) {
             return false;
@@ -141,7 +150,7 @@ public class ClickEventsPreviewer {
         
         Component tooltip = null;
         if (hoverEvent instanceof HoverEvent.ShowText) {
-             tooltip = ((HoverEvent.ShowText) hoverEvent).value();
+            tooltip = ((HoverEvent.ShowText) hoverEvent).value();
         }
 
         if (tooltip == null || tooltip.getString().isBlank()) {

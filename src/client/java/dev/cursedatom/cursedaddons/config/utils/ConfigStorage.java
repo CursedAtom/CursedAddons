@@ -3,13 +3,17 @@ package dev.cursedatom.cursedaddons.config.utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import dev.cursedatom.cursedaddons.utils.ConfigProvider;
-import dev.cursedatom.cursedaddons.utils.LoggerUtils;
+import dev.cursedatom.cursedaddons.CursedAddons;
+import dev.cursedatom.cursedaddons.config.ConfigKeys;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+/**
+ * Reads and writes the mod's JSON config file, and provides key-value access to config entries.
+ * Can load either the bundled default config or the user's config file on disk.
+ */
 public class ConfigStorage {
     public static final File FILE = new File(net.fabricmc.loader.api.FabricLoader.getInstance().getConfigDir().toFile(), "cursedaddons.json");
 
@@ -27,13 +31,12 @@ public class ConfigStorage {
         return configMap;
     }
 
-    // combine two hashmaps
     public ConfigStorage withDefault(Map<String, Object> defaultMap) {
         for (Map.Entry<String, Object> entry : defaultMap.entrySet()) {
             configMap.putIfAbsent(entry.getKey(), entry.getValue());
         }
-        if (defaultMap.containsKey("config.version")) {
-            configMap.put("config.version", defaultMap.get("config.version"));
+        if (defaultMap.containsKey(ConfigKeys.CONFIG_VERSION)) {
+            configMap.put(ConfigKeys.CONFIG_VERSION, defaultMap.get(ConfigKeys.CONFIG_VERSION));
         }
         return this;
     }
@@ -53,29 +56,22 @@ public class ConfigStorage {
                 }
             }
         } catch (Exception e) {
-            LoggerUtils.error("[CursedAddons] Failed to load config file: " + e.getMessage());
-            configMap = null;
+            CursedAddons.LOGGER.error("[CursedAddons] Failed to load config file: " + e.getMessage());
+            configMap = new java.util.HashMap<>();
         }
     }
 
     public Object get(String key) {
-        if (this.hasKey(key)) {
-            return configMap.get(key);
-        } else if (ConfigProvider.DEFAULT_CONFIG != null && ConfigProvider.DEFAULT_CONFIG.hasKey(key)) {
-            return ConfigProvider.DEFAULT_CONFIG.get(key);
-        } else {
-            LoggerUtils.error("[CursedAddons] Error occurred when getting variable \"" + key + "\", no such key!");
-            return null;
-        }
+        return configMap != null ? configMap.get(key) : null;
     }
 
     public boolean hasKey(String key) {
-        return this.configMap != null && this.configMap.get(key) != null;
+        return this.configMap != null && this.configMap.containsKey(key);
     }
 
-    public void set(String variableName, Object value) {
+    public void set(String key, Object value) {
         if (configMap != null) {
-            configMap.put(variableName, value);
+            configMap.put(key, value);
         }
     }
 
@@ -84,7 +80,7 @@ public class ConfigStorage {
         try (Writer writer = new OutputStreamWriter(new FileOutputStream(FILE), StandardCharsets.UTF_8)) {
             GSON.toJson(configMap, writer);
         } catch (Exception e) {
-            LoggerUtils.error("[CursedAddons] Couldn't save config: " + e.getMessage());
+            CursedAddons.LOGGER.error("[CursedAddons] Couldn't save config: " + e.getMessage());
         }
     }
 }

@@ -7,12 +7,8 @@
   "chatnotifications.Notifications.Enabled": false,
   "chatnotifications.Notifications.List": [],
   "general.PreviewClickEvents.Enabled": false,
-  "general.ImageHoverPreview.Enabled": false,
-  "general.ImageHoverPreview.Whitelist": [],
-  "general.ImageHoverPreview.MaxWidth": 280,
-  "general.ImageHoverPreview.MaxHeight": 200,
-  "general.ImageHoverPreview.PaddingLeft": 8,
-  "general.ImageHoverPreview.PaddingRight": 8,
-  "general.ImageHoverPreview.PaddingTop": 8,
-  "general.ImageHoverPreview.PaddingBottom": 8
+  "imagepreview.Preview.Enabled": false,
+  "imagepreview.Preview.DetectPlainTextUrls": true,
+  "imagepreview.Preview.MaxFileSizeMB": 30,
+  "imagepreview.Preview.Whitelist": []
 }

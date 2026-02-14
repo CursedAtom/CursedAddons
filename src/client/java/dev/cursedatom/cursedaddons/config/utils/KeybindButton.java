@@ -5,6 +5,10 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import static dev.cursedatom.cursedaddons.utils.TextUtils.trans;
 
+/**
+ * A {@link Button} that displays a bound key and enters a "waiting" state to capture a new key press.
+ * Used in {@link dev.cursedatom.cursedaddons.config.utils.GenericEditScreen} for keybind fields.
+ */
 public class KeybindButton extends Button {
     private InputConstants.Key boundKey = InputConstants.UNKNOWN;
     private boolean waiting = false;

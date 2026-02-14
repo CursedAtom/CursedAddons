@@ -2,22 +2,39 @@ package dev.cursedatom.cursedaddons.config.utils;
 
 import dev.cursedatom.cursedaddons.config.ConfigScreenGenerator;
 import dev.cursedatom.cursedaddons.config.ConfigScreen;
-import dev.cursedatom.cursedaddons.config.WhitelistScreen;
 import dev.cursedatom.cursedaddons.config.SpecialUnits;
+import dev.cursedatom.cursedaddons.config.UnitTypeRegistry;
+import dev.cursedatom.cursedaddons.CursedAddons;
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
+/**
+ * A generic edit screen for adding or modifying a single {@link AbstractConfigUnit} item.
+ * Field definitions are loaded from {@code config_gui.json} and rendered as typed widgets
+ * (text, toggle, keybind, cycle) via {@link FieldWidgetFactory}.
+ */
 public class GenericEditScreen extends Screen {
+    private static final Map<String, Supplier<List<String>>> dropdownProviders = new HashMap<>();
+
+    public static void registerDropdownProvider(String name, Supplier<List<String>> provider) {
+        dropdownProviders.put(name, provider);
+    }
+
     private final Screen parent;
     private final AbstractConfigUnit editingUnit;
     private final int editingIndex;
@@ -25,6 +42,8 @@ public class GenericEditScreen extends Screen {
     private final List<FieldDefinition> fieldDefinitions;
 
     private final Map<String, AbstractWidget> widgetMap = new HashMap<>();
+    private final List<DropdownSuggestor> dropdownSuggestors = new ArrayList<>();
+    private FieldWidgetFactory widgetFactory;
     private KeybindButton waitingButton = null;
     private InputConstants.Key selectedKey = InputConstants.UNKNOWN;
 
@@ -38,11 +57,7 @@ public class GenericEditScreen extends Screen {
     }
 
     private static String getUnitTypeName(Class<?> unitClass) {
-        if (unitClass == SpecialUnits.MacroUnit.class) return "Macro";
-        if (unitClass == SpecialUnits.AliasUnit.class) return "Alias";
-        if (unitClass == SpecialUnits.NotificationUnit.class) return "Notification";
-        if (unitClass == SpecialUnits.WhitelistUnit.class) return "Whitelist Domain";
-        return "Unit";
+        return UnitTypeRegistry.getDisplayName(unitClass);
     }
 
     private static List<FieldDefinition> getFieldDefinitions(Class<?> unitClass) {
@@ -65,16 +80,14 @@ public class GenericEditScreen extends Screen {
     }
 
     private static boolean matchesUnitClass(String configKey, Class<?> unitClass) {
-        if ("chatkeybindings.Macro.List".equals(configKey) && unitClass == SpecialUnits.MacroUnit.class) return true;
-        if ("commandaliases.Aliases.List".equals(configKey) && unitClass == SpecialUnits.AliasUnit.class) return true;
-        if ("chatnotifications.Notifications.List".equals(configKey) && unitClass == SpecialUnits.NotificationUnit.class) return true;
-        if ("general.ImageHoverPreview.Whitelist".equals(configKey) && unitClass == SpecialUnits.WhitelistUnit.class) return true;
-        return false;
+        UnitTypeRegistry.Registration<?> reg = UnitTypeRegistry.get(configKey);
+        return reg != null && reg.unitClass() == unitClass;
     }
 
     @Override
     protected void init() {
         super.init();
+        widgetFactory = new FieldWidgetFactory();
 
         if (fieldDefinitions == null) return;
 
@@ -97,7 +110,7 @@ public class GenericEditScreen extends Screen {
 
             // Handle keybind fields specially to wire up the waiting callback
             if ("keybind".equals(fieldDef.getType())) {
-                widget = FieldWidgetFactory.createKeybindWidget(fieldDef, centerX, y, buttonWidth, buttonHeight, initialValue, (Button.OnPress) button -> {
+                widget = widgetFactory.createKeybindWidget(fieldDef, centerX, y, buttonWidth, buttonHeight, initialValue, (Button.OnPress) button -> {
                     if (this.waitingButton != null) {
                         this.waitingButton.stopWaiting();
                     }
@@ -106,12 +119,27 @@ public class GenericEditScreen extends Screen {
                     this.waitingButton = keybindButton;
                 });
             } else {
-                widget = FieldWidgetFactory.createWidget(fieldDef, centerX, y, buttonWidth, buttonHeight, initialValue, this.font);
+                widget = widgetFactory.createWidget(fieldDef, centerX, y, buttonWidth, buttonHeight, initialValue, this.font);
             }
 
             widgetMap.put(fieldDef.getName(), widget);
             this.addRenderableWidget(widget);
             y += ("text".equals(fieldDef.getType()) ? 30 : 25);
+        }
+
+        // Wire up dropdown suggestors for fields that have a dropdown provider
+        dropdownSuggestors.clear();
+        for (FieldDefinition fieldDef : fieldDefinitions) {
+            if (fieldDef.getDropdown() != null) {
+                Supplier<List<String>> provider = dropdownProviders.get(fieldDef.getDropdown());
+                AbstractWidget widget = widgetMap.get(fieldDef.getName());
+                if (provider != null && widget instanceof EditBox) {
+                    EditBox box = (EditBox) widget;
+                    DropdownSuggestor suggestor = new DropdownSuggestor(box, this.font, provider.get());
+                    box.setResponder(suggestor::update);
+                    dropdownSuggestors.add(suggestor);
+                }
+            }
         }
 
         this.addRenderableWidget(Button.builder(Component.literal("Save"), button -> {
@@ -144,7 +172,22 @@ public class GenericEditScreen extends Screen {
     }
 
     @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        for (DropdownSuggestor suggestor : dropdownSuggestors) {
+            suggestor.render(guiGraphics, mouseX, mouseY);
+        }
+    }
+
+    @Override
     public boolean keyPressed(final KeyEvent event) {
+        // Let visible dropdown suggestors consume key events first
+        for (DropdownSuggestor suggestor : dropdownSuggestors) {
+            if (suggestor.isVisible() && suggestor.keyPressed(event.key())) {
+                return true;
+            }
+        }
+
         if (this.waitingButton != null) {
             InputConstants.Key key;
             if (event.isEscape()) {
@@ -164,7 +207,24 @@ public class GenericEditScreen extends Screen {
     }
 
     @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        for (DropdownSuggestor suggestor : dropdownSuggestors) {
+            if (suggestor.mouseScrolled(mouseX, mouseY, verticalAmount)) {
+                return true;
+            }
+        }
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+    }
+
+    @Override
     public boolean mouseClicked(final MouseButtonEvent event, final boolean doubleClick) {
+        // Let dropdown suggestors consume clicks first
+        for (DropdownSuggestor suggestor : dropdownSuggestors) {
+            if (suggestor.mouseClicked(event.x(), event.y())) {
+                return true;
+            }
+        }
+
         if (this.waitingButton != null) {
             InputConstants.Key key = InputConstants.Type.MOUSE.getOrCreate(event.button());
             this.waitingButton.setBoundKey(key);
@@ -177,14 +237,20 @@ public class GenericEditScreen extends Screen {
         }
     }
 
+    /**
+     * Saves the current widget values back to a new unit instance using reflection.
+     * For each field definition, retrieves the value from the corresponding widget,
+     * converts enum fields from String to their enum type, applies domain sanitization
+     * for whitelist entries, then notifies the parent {@link dev.cursedatom.cursedaddons.config.ConfigScreen}.
+     */
     private void saveUnit() {
         try {
             AbstractConfigUnit newUnit = (AbstractConfigUnit) unitClass.getDeclaredConstructor().newInstance();
 
             for (FieldDefinition fieldDef : fieldDefinitions) {
                 AbstractWidget widget = widgetMap.get(fieldDef.getName());
-                Object value = FieldWidgetFactory.getValueFromWidget(fieldDef, widget);
-                if (value != null && FieldWidgetFactory.isValidValue(fieldDef, value)) {
+                Object value = widgetFactory.getValueFromWidget(fieldDef, widget);
+                if (value != null && widgetFactory.isValidValue(fieldDef, value)) {
                     Field field = unitClass.getDeclaredField(fieldDef.getName());
                     if (!field.canAccess(newUnit)) {
                         field.setAccessible(true);
@@ -197,6 +263,9 @@ public class GenericEditScreen extends Screen {
                         value = enumValue;
                     }
 
+                    if (unitClass == SpecialUnits.WhitelistUnit.class && "domain".equals(fieldDef.getName())) {
+                        value = sanitizeDomain((String) value);
+                    }
                     field.set(newUnit, value);
                 }
             }
@@ -218,16 +287,43 @@ public class GenericEditScreen extends Screen {
                 return;
             }
 
+            // Validate regex pattern for notifications
+            if (newUnit instanceof SpecialUnits.NotificationUnit) {
+                SpecialUnits.NotificationUnit notification = (SpecialUnits.NotificationUnit) newUnit;
+                if (notification.regex && !notification.pattern.isEmpty()) {
+                    try {
+                        Pattern.compile(notification.pattern);
+                    } catch (Exception e) {
+                        CursedAddons.LOGGER.error("[CursedAddons] Invalid regex pattern: " + e.getMessage());
+                        return;
+                    }
+                }
+            }
+
             if (parent instanceof ConfigScreen) {
                 ((ConfigScreen) parent).onUnitSaved(newUnit, editingIndex, unitClass);
-            } else if (parent instanceof WhitelistScreen) {
-                ((WhitelistScreen) parent).onUnitSaved(newUnit, editingIndex, unitClass);
             }
             this.onClose();
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to save unit", e);
         }
+    }
+
+    /**
+     * Strips protocol ({@code http://}, {@code https://}), path, and port from user-entered domain input
+     * so that only the bare hostname is stored in the whitelist.
+     */
+    private static String sanitizeDomain(String domain) {
+        if (domain == null) return "";
+        domain = domain.trim();
+        if (domain.startsWith("http://")) domain = domain.substring(7);
+        else if (domain.startsWith("https://")) domain = domain.substring(8);
+        int slashIdx = domain.indexOf('/');
+        if (slashIdx >= 0) domain = domain.substring(0, slashIdx);
+        int colonIdx = domain.indexOf(':');
+        if (colonIdx >= 0) domain = domain.substring(0, colonIdx);
+        return domain.trim();
     }
 
     private boolean isValidUnit(AbstractConfigUnit unit) {

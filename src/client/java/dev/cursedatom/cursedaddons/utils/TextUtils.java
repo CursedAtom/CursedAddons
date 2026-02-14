@@ -9,6 +9,11 @@ import net.minecraft.util.FormattedCharSink;
 
 import java.util.List;
 
+/**
+ * Utility class for creating and converting Minecraft {@link Component} text objects.
+ * Provides helpers for translation keys with the mod prefix, legacy-format string conversion,
+ * and joining component lists.
+ */
 public class TextUtils {
     public static final String PREFIX = "cursedaddons.";
     public static final Component SPACER = literal("");
@@ -41,7 +46,7 @@ public class TextUtils {
         return Component.empty();
     }
     
-    public static Component textArray2text(List<Component> texts) {
+    public static Component joinComponents(List<Component> texts) {
         MutableComponent result = (MutableComponent) literal("");
         for (int i = 0; i < texts.size(); i++) {
             result.append(texts.get(i));
@@ -52,6 +57,12 @@ public class TextUtils {
         return result;
     }
 
+    /**
+     * Converts a {@link Component} to a legacy {@code §}-formatted string, preserving color and style codes.
+     * <p>
+     * When a formatting attribute was active on the previous character but not the current one (i.e., formatting
+     * was removed), a {@code §r} reset code is inserted first so that subsequent styles start from a clean state.
+     */
     public static String toLegacyString(Component component) {
         FormattedCharSequence sequence = component.getVisualOrderText();
         StringBuilder sb = new StringBuilder();
@@ -60,39 +71,41 @@ public class TextUtils {
 
             @Override
             public boolean accept(int index, Style style, int codePoint) {
-                // Handle style changes
                 if (!style.equals(lastStyle)) {
-                    // Color
-                    if (style.getColor() != null && (lastStyle.getColor() == null || !style.getColor().equals(lastStyle.getColor()))) {
+                    boolean formattingRemoved =
+                        (lastStyle.isBold() && !style.isBold()) ||
+                        (lastStyle.isItalic() && !style.isItalic()) ||
+                        (lastStyle.isUnderlined() && !style.isUnderlined()) ||
+                        (lastStyle.isStrikethrough() && !style.isStrikethrough()) ||
+                        (lastStyle.isObfuscated() && !style.isObfuscated()) ||
+                        (lastStyle.getColor() != null && !lastStyle.getColor().equals(style.getColor()));
+
+                    if (formattingRemoved) {
+                        sb.append('§').append(ChatFormatting.RESET.getChar());
+                    }
+
+                    if (style.getColor() != null && (formattingRemoved || lastStyle.getColor() == null || !style.getColor().equals(lastStyle.getColor()))) {
                         String colorCode = style.getColor().serialize();
                         ChatFormatting formatting = ChatFormatting.getByName(colorCode);
                         if (formatting != null) {
                             sb.append('§').append(formatting.getChar());
                         }
                     }
-                    // Bold
-                    if (style.isBold() && !lastStyle.isBold()) {
+                    if (style.isBold() && (formattingRemoved || !lastStyle.isBold())) {
                         sb.append('§').append(ChatFormatting.BOLD.getChar());
                     }
-                    // Italic
-                    if (style.isItalic() && !lastStyle.isItalic()) {
+                    if (style.isItalic() && (formattingRemoved || !lastStyle.isItalic())) {
                         sb.append('§').append(ChatFormatting.ITALIC.getChar());
                     }
-                    // Underlined
-                    if (style.isUnderlined() && !lastStyle.isUnderlined()) {
+                    if (style.isUnderlined() && (formattingRemoved || !lastStyle.isUnderlined())) {
                         sb.append('§').append(ChatFormatting.UNDERLINE.getChar());
                     }
-                    // Strikethrough
-                    if (style.isStrikethrough() && !lastStyle.isStrikethrough()) {
+                    if (style.isStrikethrough() && (formattingRemoved || !lastStyle.isStrikethrough())) {
                         sb.append('§').append(ChatFormatting.STRIKETHROUGH.getChar());
                     }
-                    // Obfuscated
-                    if (style.isObfuscated() && !lastStyle.isObfuscated()) {
+                    if (style.isObfuscated() && (formattingRemoved || !lastStyle.isObfuscated())) {
                         sb.append('§').append(ChatFormatting.OBFUSCATED.getChar());
                     }
-                    
-
-                    
 
                     lastStyle = style;
                 }

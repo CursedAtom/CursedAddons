@@ -7,7 +7,7 @@
 		"ChatScreenMixin",
 		"ClientPacketListenerMixin",
 		"DrawContextMixin",
-		"MixinKeyboard"
+		"KeyboardHandlerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
