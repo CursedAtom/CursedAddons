@@ -1,3 +1,32 @@
+## [1.0.3] - 2026-02-16
+
+### What's New
+```diff
++ Embed URL resolution: imgur, giphy, tenor links now resolve to direct images
+  - Per-domain "Resolve Embed" toggle in whitelist, with og:image fallback for other platforms (e.g. tenor, imgur)
++ Plain text URL detection: image previews work even without clickable chat formatting
++ Sound event autocomplete dropdown in notification editor
++ Image Preview now has its own config tab
++ Error tooltip shown when image fails to load
+```
+
+### Changed
+```diff
+- Removed tooltip background/padding from image previews — renders image directly
+- Removed MaxWidth/MaxHeight/Padding config — auto-sizes to 25% of screen (Shift for full)
+- Notification pattern max length reduced to 500 to match internal limit
+- Config keys moved from general.ImageHoverPreview.* to imagepreview.Preview.*
+```
+
+### Technical
+- Config caching with version-based invalidation (no more parsing the config every tick)
+- Image/texture caches now have proper cleanup
+- SSRF protection, timeouts, redirect rejection, and file-size limits on image loading (size configurable in the config file)
+- GIF memory reduction: frames encoded to PNG during decode; static images skip PNG roundtrip
+- Regex patterns pre-compiled and cached for notifications
+- Macro keybind conflict enforcement (auto-disables duplicates)
+- Removed `LoggerUtils`, `WhitelistScreen`; added `ConfigKeys`, `UnitTypeRegistry`, `UrlResolver`, `PlainTextUrlAnnotator`
+
 ## [1.0.2] - 2026-02-01
 
 ### What's New
