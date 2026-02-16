@@ -163,7 +163,7 @@
               "type": "text",
               "labelKey": "field.pattern",
               "hintKey": "field.pattern.hint",
-              "maxLength": 2000,
+              "maxLength": 500,
               "required": true
             },
             {

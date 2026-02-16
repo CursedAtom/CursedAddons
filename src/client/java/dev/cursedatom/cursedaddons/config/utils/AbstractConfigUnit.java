@@ -39,7 +39,7 @@ public abstract class AbstractConfigUnit {
                     Object value = map.get(fieldName);
                     if (value != null) {
                         if (field.getType().isEnum() && value instanceof String) {
-                            @SuppressWarnings({"unchecked", "rawtypes"})
+                            @SuppressWarnings({"rawtypes"})
                             Enum<?> enumValue = (Enum<?>) Enum.valueOf((Class<? extends Enum>) field.getType(), (String) value);
                             field.set(instance, enumValue);
                         } else {

@@ -129,5 +129,7 @@ public final class ImageHoverPreview {
     /**
      * Initializes the feature.
      */
-    public static void init() {}
+    public static void init() {
+        refreshWhitelistCache();
+    }
 }
