@@ -85,12 +85,9 @@ This helps you verify links and commands before clicking them.
 This feature displays image previews when hovering over image URLs in chat.
 
 1. In the config screen, check "Enable Image Hover Preview"
-2. Click "Open Domain Whitelist" to manage allowed domains
-3. Add trusted domains (e.g., `imgur.com`, `i.redd.it`)
-4. Hover over any clickable* image URL from whitelisted domains to see a preview
-5. Supports PNG, JPG, JPEG, GIF (animated), and WebP formats
-
--# *note: Currently only supports images that are clickable with a formatting attribute of open_url.
+2. Add trusted domains (e.g., `imgur.com`, `i.redd.it`) (you may need to enable the embed option for certain sites, especially if they don't end in a file extension)
+3. Hover over any image URL from whitelisted domains to see a preview
+4. Supports PNG, JPG, JPEG, GIF (animated), and WebP formats
 
 **Security Note**: Only images from whitelisted domains will be previewed. This helps prevent leaking your IP if someone used an ip logger image link.
 
