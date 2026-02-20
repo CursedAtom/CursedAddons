@@ -69,3 +69,9 @@ jobs:
         prerelease: ${{ contains(steps.parse_version.outputs.version, '-') }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Publish to Modrinth
+      run: ./gradlew modrinth
+      env:
+        MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        CHANGELOG_BODY: ${{ steps.changelog.outputs.body }}

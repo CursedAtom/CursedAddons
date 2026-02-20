@@ -1,6 +1,7 @@
 plugins {
 	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
 	id 'maven-publish'
+	id 'com.modrinth.minotaur' version '2.+'
 }
 
 version = project.mod_version
@@ -71,6 +72,20 @@ jar {
 
 	from("LICENSE") {
 		rename { "${it}_${inputs.properties.archivesName}"}
+	}
+}
+
+modrinth {
+	token = System.getenv("MODRINTH_TOKEN")
+	projectId = "31HzxX66"
+	versionNumber = project.mod_version
+	versionType = mod_version.contains("-") ? "beta" : "release"
+	uploadFile = remapJar
+	gameVersions = [project.minecraft_version]
+	loaders = ["fabric"]
+	changelog = System.getenv("CHANGELOG_BODY") ?: ""
+	dependencies {
+		required.project "fabric-api"
 	}
 }
 
