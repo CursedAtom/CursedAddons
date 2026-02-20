@@ -3,6 +3,7 @@ package dev.cursedatom.cursedaddons.config.utils;
 import dev.cursedatom.cursedaddons.CursedAddons;
 import dev.cursedatom.cursedaddons.config.SpecialUnits;
 import dev.cursedatom.cursedaddons.utils.ConfigProvider;
+import static dev.cursedatom.cursedaddons.utils.TextUtils.trans;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -115,14 +116,14 @@ public class ListManager<T extends AbstractConfigUnit> {
         List<AbstractWidget> widgets = new ArrayList<>();
         int screenCenterX = minecraft.getWindow().getGuiScaledWidth() / 2;
 
-        Button editButton = Button.builder(Component.literal("Edit"), button -> {
+        Button editButton = Button.builder(trans("button.edit"), button -> {
             if (selectedIndex >= 0 && selectedIndex < items.size()) {
                 onEdit.accept(items.get(selectedIndex));
             }
         }).bounds(screenCenterX - ACTION_BUTTON_WIDTH / 2, startY, ACTION_BUTTON_WIDTH, buttonHeight).build();
         widgets.add(editButton);
 
-        Button deleteButton = Button.builder(Component.literal("Delete"), button -> {
+        Button deleteButton = Button.builder(trans("button.delete"), button -> {
             if (selectedIndex >= 0 && selectedIndex < items.size()) {
                 removeItem(selectedIndex);
                 selectedIndex = -1;
@@ -131,7 +132,7 @@ public class ListManager<T extends AbstractConfigUnit> {
         }).bounds(screenCenterX - ACTION_BUTTON_WIDTH / 2 - ACTION_BUTTON_WIDTH - SPACING, startY, ACTION_BUTTON_WIDTH, buttonHeight).build();
         widgets.add(deleteButton);
 
-        Button addButton = Button.builder(Component.literal("Add"), button -> {
+        Button addButton = Button.builder(trans("button.add"), button -> {
             onEdit.accept(null);
         }).bounds(screenCenterX - ACTION_BUTTON_WIDTH / 2 + ACTION_BUTTON_WIDTH + SPACING, startY, ACTION_BUTTON_WIDTH, buttonHeight).build();
         widgets.add(addButton);

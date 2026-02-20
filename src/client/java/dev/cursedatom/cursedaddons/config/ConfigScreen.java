@@ -210,7 +210,6 @@ public class ConfigScreen extends Screen {
 
         // Done button at the bottom
         this.addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> {
-            ConfigProvider.save();
             this.onClose();
         }).bounds(centerX, this.height - 40, BUTTON_WIDTH, BUTTON_HEIGHT).build());
     }
@@ -251,6 +250,7 @@ public class ConfigScreen extends Screen {
 
     @Override
     public void onClose() {
+        ConfigProvider.save();
         if (this.parent != null) {
             this.minecraft.setScreen(this.parent);
         } else {

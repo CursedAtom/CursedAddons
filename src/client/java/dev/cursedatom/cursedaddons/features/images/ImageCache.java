@@ -128,43 +128,60 @@ public class ImageCache {
     }
 
     private static InputStream openConnectionWithTimeouts(String url) throws Exception {
-        URI uri = new URI(url);
-        // SSRF check BEFORE connecting
-        InetAddress address = InetAddress.getByName(uri.toURL().getHost());
-        if (address.isLoopbackAddress() || address.isSiteLocalAddress() || address.isLinkLocalAddress()) {
-            throw new Exception("Blocked address");
+        final int MAX_REDIRECTS = 5;
+        String currentUrl = url;
+
+        for (int i = 0; i <= MAX_REDIRECTS; i++) {
+            URI uri = new URI(currentUrl);
+
+            // SSRF check BEFORE connecting (re-checked on every redirect target)
+            InetAddress address = InetAddress.getByName(uri.toURL().getHost());
+            if (address.isLoopbackAddress() || address.isSiteLocalAddress() || address.isLinkLocalAddress()) {
+                throw new Exception("Blocked address");
+            }
+
+            HttpURLConnection connection = null;
+            try {
+                connection = (HttpURLConnection) uri.toURL().openConnection();
+                connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
+                connection.setReadTimeout(READ_TIMEOUT_MS);
+                connection.setInstanceFollowRedirects(false);
+                connection.setRequestProperty("Accept", "image/*");
+                connection.connect();
+
+                int responseCode = connection.getResponseCode();
+
+                if (responseCode >= 300 && responseCode < 400) {
+                    String location = connection.getHeaderField("Location");
+                    connection.disconnect();
+                    connection = null;
+                    if (location == null) {
+                        throw new Exception("Redirect with no Location header");
+                    }
+                    if (i == MAX_REDIRECTS) {
+                        throw new Exception("Too many redirects");
+                    }
+                    // Resolve relative Location URLs against the current URI
+                    currentUrl = uri.resolve(location).toString();
+                    continue;
+                }
+
+                if (responseCode != 200) {
+                    throw new Exception("HTTP " + responseCode);
+                }
+
+                int contentLength = connection.getContentLength();
+                if (contentLength > getMaxContentLength()) {
+                    throw new Exception("File too large (" + (contentLength / 1024 / 1024) + "MB / " + (getMaxContentLength() / 1024 / 1024) + "MB max)");
+                }
+
+                return new BoundedInputStream(connection.getInputStream(), getMaxContentLength());
+            } catch (Exception e) {
+                if (connection != null) connection.disconnect();
+                throw e;
+            }
         }
-
-        HttpURLConnection connection = null;
-        try {
-            connection = (HttpURLConnection) uri.toURL().openConnection();
-            connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
-            connection.setReadTimeout(READ_TIMEOUT_MS);
-            connection.setInstanceFollowRedirects(false);
-            connection.setRequestProperty("Accept", "image/*");
-            connection.connect();
-
-            int responseCode = connection.getResponseCode();
-
-            // Reject redirects — the whitelist validated the original host, not the redirect target
-            if (responseCode >= 300 && responseCode < 400) {
-                throw new Exception("HTTP " + responseCode);
-            }
-
-            if (responseCode != 200) {
-                throw new Exception("HTTP " + responseCode);
-            }
-
-            int contentLength = connection.getContentLength();
-            if (contentLength > getMaxContentLength()) {
-                throw new Exception("File too large (" + (contentLength / 1024 / 1024) + "MB / " + (getMaxContentLength() / 1024 / 1024) + "MB max)");
-            }
-
-            return new BoundedInputStream(connection.getInputStream(), getMaxContentLength());
-        } catch (Exception e) {
-            if (connection != null) connection.disconnect();
-            throw e;
-        }
+        throw new Exception("Too many redirects");
     }
 
     private static ImageResult loadStatic(String url, int maxWidth, int maxHeight) throws Exception {

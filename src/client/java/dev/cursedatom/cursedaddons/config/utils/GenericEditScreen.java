@@ -5,6 +5,7 @@ import dev.cursedatom.cursedaddons.config.ConfigScreen;
 import dev.cursedatom.cursedaddons.config.SpecialUnits;
 import dev.cursedatom.cursedaddons.config.UnitTypeRegistry;
 import dev.cursedatom.cursedaddons.CursedAddons;
+import static dev.cursedatom.cursedaddons.utils.TextUtils.trans;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -46,6 +47,7 @@ public class GenericEditScreen extends Screen {
     private FieldWidgetFactory widgetFactory;
     private KeybindButton waitingButton = null;
     private InputConstants.Key selectedKey = InputConstants.UNKNOWN;
+    private InputConstants.Key prevSelectedKey = InputConstants.UNKNOWN;
 
     public GenericEditScreen(Screen parent, AbstractConfigUnit unit, int index, Class<?> unitClass) {
         super(Component.literal((unit == null ? "Add " : "Edit ") + getUnitTypeName(unitClass)));
@@ -114,6 +116,7 @@ public class GenericEditScreen extends Screen {
                     if (this.waitingButton != null) {
                         this.waitingButton.stopWaiting();
                     }
+                    prevSelectedKey = selectedKey;
                     KeybindButton keybindButton = (KeybindButton) button;
                     keybindButton.startWaiting();
                     this.waitingButton = keybindButton;
@@ -142,11 +145,11 @@ public class GenericEditScreen extends Screen {
             }
         }
 
-        this.addRenderableWidget(Button.builder(Component.literal("Save"), button -> {
+        this.addRenderableWidget(Button.builder(trans("button.save"), button -> {
             saveUnit();
         }).bounds(centerX, y, buttonWidth, buttonHeight).build());
 
-        this.addRenderableWidget(Button.builder(Component.literal("Cancel"), button -> {
+        this.addRenderableWidget(Button.builder(trans("button.cancel"), button -> {
             this.onClose();
         }).bounds(centerX, y + 25, buttonWidth, buttonHeight).build());
     }
@@ -191,7 +194,7 @@ public class GenericEditScreen extends Screen {
         if (this.waitingButton != null) {
             InputConstants.Key key;
             if (event.isEscape()) {
-                key = InputConstants.UNKNOWN;
+                key = prevSelectedKey;
                 this.waitingButton.setBoundKey(key);
             } else {
                 key = InputConstants.getKey(event);

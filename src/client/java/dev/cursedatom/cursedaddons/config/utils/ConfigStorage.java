@@ -55,8 +55,12 @@ public class ConfigStorage {
                     configMap = GSON.fromJson(reader, new TypeToken<Map<String, Object>>(){}.getType());
                 }
             }
+            if (configMap == null) {
+                CursedAddons.LOGGER.error("[CursedAddons] Config file was empty or null — resetting to defaults");
+                configMap = new java.util.HashMap<>();
+            }
         } catch (Exception e) {
-            CursedAddons.LOGGER.error("[CursedAddons] Failed to load config file: " + e.getMessage());
+            CursedAddons.LOGGER.warn("[CursedAddons] Failed to load config file: " + e.getMessage());
             configMap = new java.util.HashMap<>();
         }
     }

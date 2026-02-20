@@ -46,6 +46,12 @@
   "cursedaddons.field.domain": "Domain",
   "cursedaddons.field.domain.hint": "Domain to whitelist (e.g. imgur.com)",
 
+  "cursedaddons.button.edit": "Edit",
+  "cursedaddons.button.delete": "Delete",
+  "cursedaddons.button.add": "Add",
+  "cursedaddons.button.save": "Save",
+  "cursedaddons.button.cancel": "Cancel",
+
   "cursedaddons.modifier.none": "None",
   "cursedaddons.modifier.shift": "Shift",
   "cursedaddons.modifier.alt": "Alt",

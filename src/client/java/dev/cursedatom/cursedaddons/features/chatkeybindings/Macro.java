@@ -27,6 +27,7 @@ public class Macro {
     private static void refreshCache() {
         long currentVersion = ConfigProvider.getVersion();
         if (currentVersion != cachedVersion) {
+            keyWasPressed.clear();
             cachedVersion = currentVersion;
             cachedEnabled = ConfigProvider.getBoolean(ConfigKeys.MACRO_ENABLED, false);
             List<Object> rawList = ConfigProvider.getList(ConfigKeys.MACRO_LIST);
