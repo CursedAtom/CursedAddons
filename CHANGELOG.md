@@ -1,3 +1,19 @@
+## [1.0.4] - 2026-02-20
+
+### Fixed
+```diff
+- Config now saves when closing the screen via Escape (previously only saved via the Done button)
+- Pressing Escape while rebinding a macro key now restores the previous binding instead of clearing it
+- Macro key-press state is cleared on config reload, preventing ghost activations after editing
+- Config loading now gracefully handles an empty or null config file instead of logging an error
+```
+
+### Changed
+```diff
++ Image preview now follows HTTP redirects (up to 5 hops), with SSRF protection re-checked on each target
++ Edit, Delete, Add, Save, and Cancel buttons are now translatable
+```
+
 ## [1.0.3] - 2026-02-16
 
 ### What's New
@@ -12,8 +28,8 @@
 
 ### Changed
 ```diff
-- Removed tooltip background/padding from image previews — renders image directly
-- Removed MaxWidth/MaxHeight/Padding config — auto-sizes to 25% of screen (Shift for full)
+- Removed tooltip background/padding from image previews - renders image directly
+- Removed MaxWidth/MaxHeight/Padding config - auto-sizes to 25% of screen (Shift for full)
 - Notification pattern max length reduced to 500 to match internal limit
 - Config keys moved from general.ImageHoverPreview.* to imagepreview.Preview.*
 ```
