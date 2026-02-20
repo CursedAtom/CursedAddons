@@ -11,7 +11,7 @@
 ### Changed
 ```diff
 + Image preview now follows HTTP redirects (up to 5 hops), with SSRF protection re-checked on each target
-+ Edit, Delete, Add, Save, and Cancel buttons are now translatable
++ Edit, Delete, Add, Save, and Cancel buttons are now translatable via lang file
 ```
 
 ## [1.0.3] - 2026-02-16
@@ -127,3 +127,4 @@
 + View onClick action for chat messages
 + ModMenu integration with configuration screen
 ```
+ 
