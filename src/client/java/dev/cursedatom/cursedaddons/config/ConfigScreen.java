@@ -58,7 +58,7 @@ public class ConfigScreen extends Screen {
         ListManager<T>[] managerRef = new ListManager[1]; // capture for lambda
         managerRef[0] = new ListManager<>(
             configKey, unitClass, displayFmt, tooltipFmt,
-            item -> this.minecraft.setScreen(new GenericEditScreen(this, item, managerRef[0].getSelectedIndex(), unitClass))
+            item -> this.minecraft.setScreen(new GenericEditScreen(this, item, item == null ? -1 : managerRef[0].getSelectedIndex(), unitClass))
         );
         managers.put(configKey, managerRef[0]);
     }

@@ -228,6 +228,7 @@ public class ListManager<T extends AbstractConfigUnit> {
             items.set(index, item);
         } else {
             items.add(item);
+            selectedIndex = -1;
         }
         saveItems();
     }

@@ -1,3 +1,11 @@
+## [1.0.5] - 2026-02-22
+
+### Fixed
+```diff
+- Adding new list items will no longer override a previously selected item. (Command Aliases, Domain Whitelist for Image Preview, Keybinds, Chat Notifiers)
+- When a new list entry is added, it will no longer be selected by default
+```
+
 ## [1.0.4] - 2026-02-20
 
 ### Fixed
