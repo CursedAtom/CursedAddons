@@ -12,7 +12,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +33,7 @@ public class CursedAddonsClient implements ClientModInitializer {
 
 		GenericEditScreen.registerDropdownProvider("sound_event", () -> {
 			List<String> sounds = new ArrayList<>();
-			for (ResourceLocation id : BuiltInRegistries.SOUND_EVENT.keySet()) {
+			for (Identifier id : BuiltInRegistries.SOUND_EVENT.keySet()) {
 				sounds.add(id.toString());
 			}
 			Collections.sort(sounds);

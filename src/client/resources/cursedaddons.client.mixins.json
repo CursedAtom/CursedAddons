@@ -3,6 +3,7 @@
 	"package": "dev.cursedatom.cursedaddons.mixin.client",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
+		"ChatComponentAccessor",
 		"ChatComponentMixin",
 		"ChatScreenMixin",
 		"ClientPacketListenerMixin",

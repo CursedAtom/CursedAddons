@@ -68,22 +68,10 @@ public final class GifDecoder {
             List<byte[]> encodedFrames = new ArrayList<>();
             int[] delays = new int[numFrames];
 
-            // Canvas for compositing frames (use scaled dimensions if needed)
-            BufferedImage canvas = new BufferedImage(
-                needsScaling ? scaledWidth : canvasWidth,
-                needsScaling ? scaledHeight : canvasHeight,
-                BufferedImage.TYPE_INT_ARGB
-            );
+            // Canvas for compositing frames at full resolution
+            BufferedImage canvas = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = canvas.createGraphics();
             g.setBackground(new Color(0, 0, 0, 0));
-
-            // Enable high-quality scaling if needed
-            if (needsScaling) {
-                g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,
-                                  java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                g.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING,
-                                  java.awt.RenderingHints.VALUE_RENDER_QUALITY);
-            }
 
             BufferedImage previousCanvas = null;
             String previousDisposal = "none";
@@ -102,17 +90,8 @@ public final class GifDecoder {
                         case "restoreToBackgroundColor":
                             if (previousBounds != null) {
                                 g.setComposite(AlphaComposite.Clear);
-                                if (needsScaling) {
-                                    g.fillRect(
-                                        (int) (previousBounds.x * scale),
-                                        (int) (previousBounds.y * scale),
-                                        (int) (previousBounds.width * scale),
-                                        (int) (previousBounds.height * scale)
-                                    );
-                                } else {
-                                    g.fillRect(previousBounds.x, previousBounds.y,
-                                              previousBounds.width, previousBounds.height);
-                                }
+                                g.fillRect(previousBounds.x, previousBounds.y,
+                                          previousBounds.width, previousBounds.height);
                                 g.setComposite(AlphaComposite.SrcOver);
                             }
                             break;
@@ -132,19 +111,17 @@ public final class GifDecoder {
                     previousCanvas = copyImage(canvas);
                 }
 
-                // Draw current frame at its offset position (scaled if needed)
-                if (needsScaling) {
-                    int scaledX = (int) (info.x * scale);
-                    int scaledY = (int) (info.y * scale);
-                    int scaledFrameWidth = (int) (rawFrame.getWidth() * scale);
-                    int scaledFrameHeight = (int) (rawFrame.getHeight() * scale);
-                    g.drawImage(rawFrame, scaledX, scaledY, scaledFrameWidth, scaledFrameHeight, null);
-                } else {
-                    g.drawImage(rawFrame, info.x, info.y, null);
-                }
+                // Draw current frame at its offset position (full resolution)
+                g.drawImage(rawFrame, info.x, info.y, null);
 
-                // Encode the composited frame to PNG immediately and release the pixel copy
-                encodedFrames.add(ImageCache.bufferedToPng(canvas));
+                // Downscale composited frame using progressive scaling, then encode to PNG
+                if (needsScaling) {
+                    BufferedImage scaled = ImageCache.progressiveDownscale(canvas, scaledWidth, scaledHeight);
+                    encodedFrames.add(ImageCache.bufferedToPng(scaled));
+                    scaled.flush();
+                } else {
+                    encodedFrames.add(ImageCache.bufferedToPng(canvas));
+                }
 
                 previousDisposal = info.disposal;
                 previousBounds = new Rectangle(info.x, info.y, rawFrame.getWidth(), rawFrame.getHeight());

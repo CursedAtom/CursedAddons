@@ -11,6 +11,7 @@ public final class ConfigKeys {
     public static final String NOTIFICATIONS_ENABLED = "chatnotifications.Notifications.Enabled";
     public static final String NOTIFICATIONS_LIST = "chatnotifications.Notifications.List";
     public static final String CLICK_EVENTS_ENABLED = "general.PreviewClickEvents.Enabled";
+    public static final String COPY_CHAT_MESSAGE_ENABLED = "general.CopyChatMessage.Enabled";
     public static final String IMAGE_PREVIEW_ENABLED = "imagepreview.Preview.Enabled";
     public static final String IMAGE_DETECT_PLAIN_URLS = "imagepreview.Preview.DetectPlainTextUrls";
     public static final String IMAGE_MAX_FILE_SIZE_MB = "imagepreview.Preview.MaxFileSizeMB";

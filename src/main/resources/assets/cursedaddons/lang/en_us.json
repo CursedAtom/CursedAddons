@@ -8,6 +8,8 @@
   "cursedaddons.category.chat_notifications": "Chat Notifications",
 
   "cursedaddons.preview_click_events.enabled": "Enable Click Events Preview",
+  "cursedaddons.copy_chat_message.enabled": "Enable Copy Chat Message",
+  "cursedaddons.copy_chat_message.enabled.description": "Right-click to copy. Ctrl+Right-click for formatted. Ctrl+Shift+Right-click for JSON.",
   "cursedaddons.image_hover_preview.enabled": "Enable Image Hover Preview",
   "cursedaddons.image_hover_preview.whitelist": "Image Preview Whitelist",
   "cursedaddons.image_hover_preview.detect_plain_text_urls": "Detect Plain Text Image URLs",
@@ -68,6 +70,9 @@
   "cursedaddons.texts.PreviewClickEvents.clickEvent.changePage": "§c - §rChange Page: %s",
   "cursedaddons.texts.PreviewClickEvents.clickEvent.copyToClipboard": "§c - §rCopy To Clipboard: %s",
   "cursedaddons.texts.PreviewClickEvents.clickEvent.custom": "§c - §rCustom: %s",
+  "cursedaddons.texts.CopyChatMessage.copiedPlain": "Copied message to clipboard",
+  "cursedaddons.texts.CopyChatMessage.copiedFormatted": "Copied formatted message to clipboard",
+  "cursedaddons.texts.CopyChatMessage.copiedJson": "Copied message as JSON to clipboard",
   "cursedaddons.texts.ImageHoverPreview.InvalidImage": "Invalid image link or failed to load",
   "cursedaddons.texts.ImageHoverPreview.Loading": "Loading image...",
   "cursedaddons.error.gui_open_failed": "Failed to open CursedAddons config GUI: %s",

@@ -223,17 +223,50 @@ public class ImageCache {
             return image;
         }
 
-        int scaledWidth = (int) (width * scale);
-        int scaledHeight = (int) (height * scale);
+        int targetWidth = (int) (width * scale);
+        int targetHeight = (int) (height * scale);
 
-        BufferedImage scaled = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = scaled.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g.drawImage(image, 0, 0, scaledWidth, scaledHeight, null);
-        g.dispose();
+        return progressiveDownscale(image, targetWidth, targetHeight);
+    }
 
-        return scaled;
+    /**
+     * Downscales an image by progressively halving its dimensions before a final
+     * scale step. This avoids the "crunchy" artifacts that single-step bilinear
+     * interpolation produces when the scale ratio is large.
+     */
+    static BufferedImage progressiveDownscale(BufferedImage image, int targetWidth, int targetHeight) {
+        BufferedImage current = image;
+        int w = current.getWidth();
+        int h = current.getHeight();
+
+        // Progressively halve dimensions until within 2x of target
+        while (w / 2 >= targetWidth && h / 2 >= targetHeight) {
+            int halfW = w / 2;
+            int halfH = h / 2;
+            BufferedImage half = new BufferedImage(halfW, halfH, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = half.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g.drawImage(current, 0, 0, halfW, halfH, null);
+            g.dispose();
+            if (current != image) current.flush();
+            current = half;
+            w = halfW;
+            h = halfH;
+        }
+
+        // Final scale to exact target dimensions
+        if (w != targetWidth || h != targetHeight) {
+            BufferedImage result = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = result.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g.drawImage(current, 0, 0, targetWidth, targetHeight, null);
+            g.dispose();
+            if (current != image) current.flush();
+            current = result;
+        }
+
+        return current;
     }
 
     private static ImageResult loadGif(String url, int maxWidth, int maxHeight) throws Exception {

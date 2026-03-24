@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import dev.cursedatom.cursedaddons.CursedAddons;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.io.ByteArrayInputStream;
 import java.util.LinkedHashMap;
@@ -120,7 +120,7 @@ public final class ImageTextureManager {
         int width = result.getWidth();
         int height = result.getHeight();
 
-        ResourceLocation[] frameLocations = new ResourceLocation[frameCount];
+        Identifier[] frameLocations = new Identifier[frameCount];
         AtomicBoolean cancelled = new AtomicBoolean(false);
         AnimatedTextureEntry entry = new AnimatedTextureEntry(frameLocations, frameDelays, width, height);
 
@@ -166,7 +166,7 @@ public final class ImageTextureManager {
      * then schedules their texture registration on the render thread.
      */
     private static void registerFrameBatch(String cacheKey, byte[][] framePngData,
-                                           ResourceLocation[] frameLocations,
+                                           Identifier[] frameLocations,
                                            int start, int end, AtomicBoolean cancelled) throws Exception {
         NativeImage[] batch = new NativeImage[end - start];
         try {
@@ -200,7 +200,7 @@ public final class ImageTextureManager {
                     DynamicTexture dynamicTexture = new DynamicTexture(nameSupplier, batch[i]);
 
                     String path = "gif_frames/" + id;
-                    ResourceLocation location = ResourceLocation.fromNamespaceAndPath("cursedaddons", path);
+                    Identifier location = Identifier.fromNamespaceAndPath("cursedaddons", path);
 
                     Minecraft.getInstance().getTextureManager().register(location, dynamicTexture);
                     frameLocations[frameIndex] = location;
@@ -232,7 +232,7 @@ public final class ImageTextureManager {
 
             AnimatedTextureEntry animated = animatedCache.get(cacheKey);
             if (animated != null) {
-                ResourceLocation currentFrame = animated.getCurrentFrameLocation();
+                Identifier currentFrame = animated.getCurrentFrameLocation();
                 if (currentFrame != null) {
                     return new ImageHoverEvent.ImageData(imageUrl, currentFrame, animated.width, animated.height);
                 }
@@ -296,7 +296,7 @@ public final class ImageTextureManager {
             DynamicTexture dynamicTexture = new DynamicTexture(nameSupplier, nativeImage);
 
             String path = "tooltip_images/" + id;
-            ResourceLocation location = ResourceLocation.fromNamespaceAndPath("cursedaddons", path);
+            Identifier location = Identifier.fromNamespaceAndPath("cursedaddons", path);
 
             Minecraft.getInstance().getTextureManager().register(location, dynamicTexture);
             synchronized (textureCacheLock) {
@@ -310,7 +310,7 @@ public final class ImageTextureManager {
 
     private static void releaseAnimatedEntry(AnimatedTextureEntry entry) {
         var textureManager = Minecraft.getInstance().getTextureManager();
-        for (ResourceLocation loc : entry.frameLocations) {
+        for (Identifier loc : entry.frameLocations) {
             if (loc != null) {
                 textureManager.release(loc);
             }
@@ -321,7 +321,7 @@ public final class ImageTextureManager {
         // Caller must hold textureCacheLock — only count actually registered textures
         int count = staticCache.size();
         for (AnimatedTextureEntry entry : animatedCache.values()) {
-            for (ResourceLocation loc : entry.frameLocations) {
+            for (Identifier loc : entry.frameLocations) {
                 if (loc != null) count++;
             }
         }
@@ -352,11 +352,11 @@ public final class ImageTextureManager {
     }
 
     private static class TextureEntry {
-        final ResourceLocation textureLocation;
+        final Identifier textureLocation;
         final int width;
         final int height;
 
-        TextureEntry(ResourceLocation textureLocation, int width, int height) {
+        TextureEntry(Identifier textureLocation, int width, int height) {
             this.textureLocation = textureLocation;
             this.width = width;
             this.height = height;
@@ -364,14 +364,14 @@ public final class ImageTextureManager {
     }
 
     private static class AnimatedTextureEntry {
-        final ResourceLocation[] frameLocations;
+        final Identifier[] frameLocations;
         final int[] delays;
         final int width;
         final int height;
         final long startTime;
         final int totalDuration;
 
-        AnimatedTextureEntry(ResourceLocation[] frameLocations, int[] delays, int width, int height) {
+        AnimatedTextureEntry(Identifier[] frameLocations, int[] delays, int width, int height) {
             this.frameLocations = frameLocations;
             this.delays = delays;
             this.width = width;
@@ -382,7 +382,7 @@ public final class ImageTextureManager {
             this.totalDuration = total;
         }
 
-        ResourceLocation getCurrentFrameLocation() {
+        Identifier getCurrentFrameLocation() {
             if (frameLocations.length == 0) return null;
 
             if (totalDuration <= 0) return findNearestLoaded(0);
@@ -406,7 +406,7 @@ public final class ImageTextureManager {
          * to the nearest previously loaded frame. This allows partial rendering
          * while remaining frames are still being decoded asynchronously.
          */
-        private ResourceLocation findNearestLoaded(int targetIndex) {
+        private Identifier findNearestLoaded(int targetIndex) {
             if (frameLocations[targetIndex] != null) return frameLocations[targetIndex];
 
             for (int i = targetIndex - 1; i >= 0; i--) {

@@ -1,6 +1,6 @@
 package dev.cursedatom.cursedaddons.features.images;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Container for image hover data used by {@link dev.cursedatom.cursedaddons.mixin.client.DrawContextMixin}
@@ -13,11 +13,11 @@ public final class ImageHoverEvent {
 
     public static class ImageData {
         private final String imageUrl;
-        private final ResourceLocation textureLocation;
+        private final Identifier textureLocation;
         private final int width;
         private final int height;
 
-        public ImageData(String imageUrl, ResourceLocation textureLocation, int width, int height) {
+        public ImageData(String imageUrl, Identifier textureLocation, int width, int height) {
             this.imageUrl = imageUrl;
             this.textureLocation = textureLocation;
             this.width = width;
@@ -28,7 +28,7 @@ public final class ImageHoverEvent {
             return imageUrl;
         }
 
-        public ResourceLocation getTextureLocation() {
+        public Identifier getTextureLocation() {
             return textureLocation;
         }
 

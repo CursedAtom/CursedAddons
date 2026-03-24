@@ -1,6 +1,7 @@
 package dev.cursedatom.cursedaddons.config.utils;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import static dev.cursedatom.cursedaddons.utils.TextUtils.trans;
@@ -47,5 +48,11 @@ public class KeybindButton extends Button {
 
     public InputConstants.Key getBoundKey() {
         return boundKey;
+    }
+
+    @Override
+    protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderDefaultSprite(guiGraphics);
+        renderDefaultLabel(guiGraphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE));
     }
 }

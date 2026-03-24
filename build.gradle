@@ -42,7 +42,7 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation "com.terraformersmc:modmenu:16.0.0-rc.1"
+    modImplementation "com.terraformersmc:modmenu:17.0.0-beta.2"
 }
 
 processResources {
@@ -81,7 +81,7 @@ modrinth {
 	versionNumber = project.mod_version
 	versionType = mod_version.contains("-") ? "beta" : "release"
 	uploadFile = remapJar
-	gameVersions = [project.minecraft_version]
+	gameVersions = ["1.21.10", "1.21.11"]
 	loaders = ["fabric"]
 	changelog = System.getenv("CHANGELOG_BODY") ?: ""
 	dependencies {

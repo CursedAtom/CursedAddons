@@ -8,6 +8,12 @@
           "type": "boolean",
           "key": "general.PreviewClickEvents.Enabled",
           "labelKey": "preview_click_events.enabled"
+        },
+        {
+          "type": "boolean",
+          "key": "general.CopyChatMessage.Enabled",
+          "labelKey": "copy_chat_message.enabled",
+          "descriptionKey": "copy_chat_message.enabled.description"
         }
       ]
     },

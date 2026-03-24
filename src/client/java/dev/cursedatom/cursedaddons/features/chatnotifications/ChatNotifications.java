@@ -11,7 +11,7 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 
 import java.util.ArrayList;
@@ -160,7 +160,7 @@ public class ChatNotifications {
                         if (matcher != null && notification.regex) {
                             soundToPlay = replaceCaptureGroups(soundToPlay, matcher);
                         }
-                        ResourceLocation soundLocation = ResourceLocation.parse(soundToPlay);
+                        Identifier soundLocation = Identifier.parse(soundToPlay);
                         Holder<SoundEvent> holder = BuiltInRegistries.SOUND_EVENT.get(soundLocation).orElseThrow();
                         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(holder, 1.0F));
                     } catch (Exception e) {
