@@ -5,7 +5,7 @@ import dev.cursedatom.cursedaddons.config.SpecialUnits;
 import dev.cursedatom.cursedaddons.utils.ConfigProvider;
 import static dev.cursedatom.cursedaddons.utils.TextUtils.trans;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
@@ -248,12 +248,12 @@ public class ListManager<T extends AbstractConfigUnit> {
         }
 
         @Override
-        protected void renderListBackground(final GuiGraphics graphics) {
+        protected void extractListBackground(final GuiGraphicsExtractor graphics) {
             // Don't render the default list background to avoid interfering with buttons
         }
 
         @Override
-        protected void renderSelection(final GuiGraphics graphics, final ConfigEntry entry, final int outlineColor) {
+        protected void extractSelection(final GuiGraphicsExtractor graphics, final ConfigEntry entry, final int outlineColor) {
             // Don't render selection background to avoid interfering with buttons
         }
 
@@ -278,7 +278,7 @@ public class ListManager<T extends AbstractConfigUnit> {
         }
 
         @Override
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float delta) {
+        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float delta) {
             // Position buttons relative to this entry
             int buttonY = this.getContentY();
             int displayButtonX = this.getContentX();
@@ -287,12 +287,12 @@ public class ListManager<T extends AbstractConfigUnit> {
             if (!this.children.isEmpty()) {
                 Button displayButton = (Button) this.children.get(0);
                 displayButton.setPosition(displayButtonX, buttonY);
-                displayButton.render(graphics, mouseX, mouseY, delta);
+                displayButton.extractRenderState(graphics, mouseX, mouseY, delta);
 
                 if (this.children.size() > 1) {
                     Button toggleButton = (Button) this.children.get(1);
                     toggleButton.setPosition(toggleButtonX, buttonY);
-                    toggleButton.render(graphics, mouseX, mouseY, delta);
+                    toggleButton.extractRenderState(graphics, mouseX, mouseY, delta);
                 }
             }
         }

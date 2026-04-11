@@ -16,7 +16,7 @@ public class MessageUtils {
 
     public static void sendToNonPublicChat(Component text) {
         if (Minecraft.getInstance().gui != null) {
-            Minecraft.getInstance().gui.getChat().addMessage(text);
+            Minecraft.getInstance().gui.getChat().addClientSystemMessage(text);
         }
     }
 

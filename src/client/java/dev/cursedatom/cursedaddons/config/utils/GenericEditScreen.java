@@ -7,7 +7,7 @@ import dev.cursedatom.cursedaddons.config.UnitTypeRegistry;
 import dev.cursedatom.cursedaddons.CursedAddons;
 import static dev.cursedatom.cursedaddons.utils.TextUtils.trans;
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -175,8 +175,8 @@ public class GenericEditScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
         for (DropdownSuggestor suggestor : dropdownSuggestors) {
             suggestor.render(guiGraphics, mouseX, mouseY);
         }

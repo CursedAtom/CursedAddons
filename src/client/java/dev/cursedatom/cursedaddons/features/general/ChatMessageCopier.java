@@ -8,7 +8,7 @@ import dev.cursedatom.cursedaddons.config.ConfigKeys;
 import dev.cursedatom.cursedaddons.mixin.client.ChatComponentAccessor;
 import dev.cursedatom.cursedaddons.utils.ConfigProvider;
 import dev.cursedatom.cursedaddons.utils.TextUtils;
-import net.minecraft.client.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;

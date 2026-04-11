@@ -9,7 +9,7 @@ import dev.cursedatom.cursedaddons.features.images.ImageTextureManager;
 import dev.cursedatom.cursedaddons.utils.ConfigProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.ClickEvent;
@@ -26,10 +26,10 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Mixin for {@link net.minecraft.client.gui.GuiGraphics} that intercepts component hover rendering
+ * Mixin for {@link net.minecraft.client.gui.GuiGraphicsExtractor} that intercepts component hover rendering
  * to display image previews when hovering over image URLs in chat.
  */
-@Mixin(GuiGraphics.class)
+@Mixin(GuiGraphicsExtractor.class)
 public abstract class DrawContextMixin {
 
     @Shadow
@@ -56,18 +56,20 @@ public abstract class DrawContextMixin {
     @Shadow
     public abstract void setTooltipForNextFrame(Font font, Component component, int x, int y);
 
+    @Shadow
+    abstract void componentHoverEffect(Font font, Style style, int mouseX, int mouseY);
+
     /**
      * For click-event-only styles (no HoverEvent), hoveredTextStyle is never set, so
-     * renderComponentHoverEffect is never called. clickableTextStyle IS set for these styles,
-     * so we call renderComponentHoverEffect manually here when the feature is enabled.
+     * componentHoverEffect is never called. clickableTextStyle IS set for these styles,
+     * so we call componentHoverEffect manually here when the feature is enabled.
      */
-    @Inject(at = @At("RETURN"), method = "renderDeferredElements")
+    @Inject(at = @At("RETURN"), method = "extractDeferredElements")
     private void cursedaddons$renderClickEventPreview(CallbackInfo ci) {
         if (hoveredTextStyle != null) return;
         if (clickableTextStyle == null) return;
         if (!ConfigProvider.getBoolean(ConfigKeys.CLICK_EVENTS_ENABLED, false)) return;
-        GuiGraphics graphics = (GuiGraphics) (Object) this;
-        graphics.renderComponentHoverEffect(Minecraft.getInstance().font, clickableTextStyle, mouseX, mouseY);
+        componentHoverEffect(Minecraft.getInstance().font, clickableTextStyle, mouseX, mouseY);
     }
 
     /**
@@ -75,7 +77,7 @@ public abstract class DrawContextMixin {
      * For image URLs with image preview disabled, strips the "Loading..." placeholder so
      * vanilla doesn't render it, then falls through to click event enrichment if enabled.
      */
-    @ModifyVariable(method = "renderComponentHoverEffect", at = @At("HEAD"), argsOnly = true, ordinal = 0)
+    @ModifyVariable(method = "componentHoverEffect", at = @At("HEAD"), argsOnly = true, ordinal = 0)
     private Style cursedaddons$enrichHoverStyle(Style style) {
         if (style == null) return null;
         if (cursedaddons$findImageUrl(style) != null) {
@@ -90,7 +92,7 @@ public abstract class DrawContextMixin {
         return style;
     }
 
-    @Inject(at = @At("HEAD"), method = "renderComponentHoverEffect", cancellable = true)
+    @Inject(at = @At("HEAD"), method = "componentHoverEffect", cancellable = true)
     private void cursedaddons$renderImageHoverEffect(Font font, Style style, int mouseX, int mouseY, CallbackInfo ci) {
         if (style == null) return;
 
@@ -103,7 +105,7 @@ public abstract class DrawContextMixin {
 
         ci.cancel();
 
-        GuiGraphics graphics = (GuiGraphics) (Object) this;
+        GuiGraphicsExtractor graphics = (GuiGraphicsExtractor) (Object) this;
 
         Minecraft minecraft = Minecraft.getInstance();
         boolean shiftHeld = GLFW.glfwGetKey(minecraft.getWindow().handle(), GLFW.GLFW_KEY_LEFT_SHIFT) == GLFW.GLFW_PRESS
@@ -169,7 +171,7 @@ public abstract class DrawContextMixin {
     }
 
     @Unique
-    private void cursedaddons$renderImageTooltip(GuiGraphics graphics, ImageHoverEvent.ImageData imageData, int mouseX, int mouseY) {
+    private void cursedaddons$renderImageTooltip(GuiGraphicsExtractor graphics, ImageHoverEvent.ImageData imageData, int mouseX, int mouseY) {
         int screenWidth = this.guiWidth();
         int screenHeight = this.guiHeight();
 

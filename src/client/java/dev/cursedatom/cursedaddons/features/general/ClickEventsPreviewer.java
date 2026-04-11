@@ -54,7 +54,7 @@ public class ClickEventsPreviewer {
                     entityContent = ((HoverEvent.ShowEntity) hoverEvent).entity();
                 }
                 if (hoverEvent instanceof HoverEvent.ShowItem) {
-                    itemStack = ((HoverEvent.ShowItem) hoverEvent).item();
+                    itemStack = ((HoverEvent.ShowItem) hoverEvent).item().create();
                 }
 
                 if (entityContent != null) {

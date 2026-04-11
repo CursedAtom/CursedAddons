@@ -2,7 +2,7 @@ package dev.cursedatom.cursedaddons.config.utils;
 
 import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class DropdownSuggestor {
         visible = !filtered.isEmpty();
     }
 
-    public void render(GuiGraphics graphics, int mouseX, int mouseY) {
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (!visible || filtered.isEmpty()) return;
 
         int x = editBox.getX();
@@ -84,7 +84,7 @@ public class DropdownSuggestor {
             String text = filtered.get(i);
             // Trim text to fit width
             String display = font.plainSubstrByWidth(text, w - 6);
-            graphics.drawString(font, display, x + 3, rowY + 2, TEXT_COLOR);
+            graphics.text(font, display, x + 3, rowY + 2, TEXT_COLOR);
         }
 
         // Scrollbar hint if there are more items
