@@ -4,6 +4,7 @@ import dev.cursedatom.cursedaddons.config.ConfigKeys;
 import dev.cursedatom.cursedaddons.utils.ConfigProvider;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 
@@ -89,7 +90,10 @@ public final class PlainTextUrlAnnotator {
 
                 try {
                     URI uri = new URI(url);
-                    Style urlStyle = seg.style.withClickEvent(new ClickEvent.OpenUrl(uri));
+                    Style urlStyle = seg.style
+                        .withClickEvent(new ClickEvent.OpenUrl(uri))
+                        .withHoverEvent(new HoverEvent.ShowText(
+                            Component.translatable("cursedaddons.texts.ImageHoverPreview.Loading")));
                     result.append(Component.literal(url).setStyle(urlStyle));
                 } catch (Exception e) {
                     result.append(Component.literal(url).setStyle(seg.style));

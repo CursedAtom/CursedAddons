@@ -1,9 +1,12 @@
 package dev.cursedatom.cursedaddons.mixin.client;
 
+import dev.cursedatom.cursedaddons.config.ConfigKeys;
+import dev.cursedatom.cursedaddons.features.general.ClickEventsPreviewer;
 import dev.cursedatom.cursedaddons.features.images.ImageCache;
 import dev.cursedatom.cursedaddons.features.images.ImageHoverEvent;
 import dev.cursedatom.cursedaddons.features.images.ImageHoverPreview;
 import dev.cursedatom.cursedaddons.features.images.ImageTextureManager;
+import dev.cursedatom.cursedaddons.utils.ConfigProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -19,6 +22,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
@@ -27,6 +31,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  */
 @Mixin(GuiGraphics.class)
 public abstract class DrawContextMixin {
+
+    @Shadow
+    private Style hoveredTextStyle;
+
+    @Shadow
+    private Style clickableTextStyle;
+
+    @Shadow
+    private int mouseX;
+
+    @Shadow
+    private int mouseY;
 
     @Shadow
     public abstract int guiWidth();
@@ -40,12 +56,50 @@ public abstract class DrawContextMixin {
     @Shadow
     public abstract void setTooltipForNextFrame(Font font, Component component, int x, int y);
 
+    /**
+     * For click-event-only styles (no HoverEvent), hoveredTextStyle is never set, so
+     * renderComponentHoverEffect is never called. clickableTextStyle IS set for these styles,
+     * so we call renderComponentHoverEffect manually here when the feature is enabled.
+     */
+    @Inject(at = @At("RETURN"), method = "renderDeferredElements")
+    private void cursedaddons$renderClickEventPreview(CallbackInfo ci) {
+        if (hoveredTextStyle != null) return;
+        if (clickableTextStyle == null) return;
+        if (!ConfigProvider.getBoolean(ConfigKeys.CLICK_EVENTS_ENABLED, false)) return;
+        GuiGraphics graphics = (GuiGraphics) (Object) this;
+        graphics.renderComponentHoverEffect(Minecraft.getInstance().font, clickableTextStyle, mouseX, mouseY);
+    }
+
+    /**
+     * Enriches the hover style with click event preview text for non-image-URL styles.
+     * For image URLs with image preview disabled, strips the "Loading..." placeholder so
+     * vanilla doesn't render it, then falls through to click event enrichment if enabled.
+     */
+    @ModifyVariable(method = "renderComponentHoverEffect", at = @At("HEAD"), argsOnly = true, ordinal = 0)
+    private Style cursedaddons$enrichHoverStyle(Style style) {
+        if (style == null) return null;
+        if (cursedaddons$findImageUrl(style) != null) {
+            if (ImageHoverPreview.isEnabled()) return style; // @Inject below handles rendering
+            // Image preview disabled: strip the "Loading..." placeholder so it doesn't render as raw text.
+            // Fall through to click event enrichment below.
+            style = style.withHoverEvent(null);
+        }
+        if (ConfigProvider.getBoolean(ConfigKeys.CLICK_EVENTS_ENABLED, false)) {
+            return ClickEventsPreviewer.enrichStyleWithPreview(style);
+        }
+        return style;
+    }
+
     @Inject(at = @At("HEAD"), method = "renderComponentHoverEffect", cancellable = true)
     private void cursedaddons$renderImageHoverEffect(Font font, Style style, int mouseX, int mouseY, CallbackInfo ci) {
-        if (!ImageHoverPreview.isEnabled() || style == null) return;
+        if (style == null) return;
 
         String imageUrl = cursedaddons$findImageUrl(style);
         if (imageUrl == null) return;
+
+        // When image preview is disabled, don't cancel — @ModifyVariable already stripped the
+        // "Loading..." placeholder and may have added click event preview; let vanilla render it.
+        if (!ImageHoverPreview.isEnabled()) return;
 
         ci.cancel();
 
