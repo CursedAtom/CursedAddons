@@ -13,21 +13,24 @@ import static dev.cursedatom.cursedaddons.utils.TextUtils.trans;
 public class KeybindButton extends Button {
     private InputConstants.Key boundKey = InputConstants.UNKNOWN;
     private boolean waiting = false;
+    private final String label;
 
-    public KeybindButton(int x, int y, int width, int height, InputConstants.Key initialKey, OnPress onPress) {
-        super(x, y, width, height, getDisplayMessage(initialKey), onPress, DEFAULT_NARRATION);
+    public KeybindButton(int x, int y, int width, int height, String label, InputConstants.Key initialKey, OnPress onPress) {
+        super(x, y, width, height, getDisplayMessage(label, initialKey), onPress, DEFAULT_NARRATION);
         this.boundKey = initialKey;
+        this.label = label;
     }
 
-    private static Component getDisplayMessage(InputConstants.Key key) {
-        return key == InputConstants.UNKNOWN ? Component.translatable("gui.none") : key.getDisplayName();
+    private static Component getDisplayMessage(String label, InputConstants.Key key) {
+        Component keyComp = key == InputConstants.UNKNOWN ? Component.translatable("gui.none") : key.getDisplayName();
+        return Component.literal(label + ": ").append(keyComp);
     }
 
     public void updateDisplay() {
         if (waiting) {
-            this.setMessage(trans("chatkeybindings.controls.keybind.waiting"));
+            this.setMessage(Component.literal(label + ": ").append(trans("chatkeybindings.controls.keybind.waiting")));
         } else {
-            this.setMessage(getDisplayMessage(boundKey));
+            this.setMessage(getDisplayMessage(label, boundKey));
         }
     }
 

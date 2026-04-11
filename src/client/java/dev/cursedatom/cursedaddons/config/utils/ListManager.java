@@ -224,11 +224,31 @@ public class ListManager<T extends AbstractConfigUnit> {
     }
 
     public void saveItem(T item, int index) {
+        int savedIndex;
         if (index >= 0 && index < items.size()) {
             items.set(index, item);
+            savedIndex = index;
         } else {
             items.add(item);
             selectedIndex = -1;
+            savedIndex = items.size() - 1;
+        }
+        if (item instanceof SpecialUnits.MacroUnit) {
+            SpecialUnits.MacroUnit saved = (SpecialUnits.MacroUnit) item;
+            if (saved.enabled) {
+                for (int i = 0; i < items.size(); i++) {
+                    if (i == savedIndex) continue;
+                    T other = items.get(i);
+                    if (other instanceof SpecialUnits.MacroUnit) {
+                        SpecialUnits.MacroUnit otherMacro = (SpecialUnits.MacroUnit) other;
+                        if (otherMacro.enabled
+                                && otherMacro.key.equals(saved.key)
+                                && otherMacro.modifier == saved.modifier) {
+                            otherMacro.enabled = false;
+                        }
+                    }
+                }
+            }
         }
         saveItems();
     }

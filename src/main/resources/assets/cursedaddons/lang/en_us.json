@@ -54,6 +54,8 @@
   "cursedaddons.button.save": "Save",
   "cursedaddons.button.cancel": "Cancel",
 
+  "cursedaddons.chatkeybindings.controls.keybind.waiting": "Press a key...",
+
   "cursedaddons.modifier.none": "None",
   "cursedaddons.modifier.shift": "Shift",
   "cursedaddons.modifier.alt": "Alt",
