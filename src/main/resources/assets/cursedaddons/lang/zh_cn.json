@@ -54,6 +54,8 @@
   "cursedaddons.button.save": "保存",
   "cursedaddons.button.cancel": "取消",
 
+  "cursedaddons.chatkeybindings.controls.keybind.waiting": "请按下按键...",
+
   "cursedaddons.modifier.none": "无",
   "cursedaddons.modifier.shift": "Shift",
   "cursedaddons.modifier.alt": "Alt",

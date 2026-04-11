@@ -79,7 +79,8 @@ public class FieldWidgetFactory {
         if (initialValue instanceof String) {
             initialKey = InputConstants.getKey((String) initialValue);
         }
-        return new KeybindButton(x, y, width, height, initialKey, onPress);
+        String label = trans(fieldDef.getLabelKey()).getString();
+        return new KeybindButton(x, y, width, height, label, initialKey, onPress);
     }
 
     private AbstractWidget createCycleWidget(FieldDefinition fieldDef, int x, int y, int width, int height, Object initialValue) {
