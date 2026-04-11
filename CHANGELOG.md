@@ -1,3 +1,24 @@
+## [1.0.6] - 2026-04-10
+
+### What's New
+```diff
++ Copy Chat Messages: right-click any chat message to copy it to the clipboard
+  - Right-click: plain text
+  - Ctrl+Right-click: legacy formatted text (§ color codes preserved)
+  - Ctrl+Shift+Right-click: raw JSON component
+```
+
+### Fixed
+```diff
+- Image downscaling no longer produces a pixelated/pixel-art result for large images
+- Image link tooltips are no longer removed when Image Hover Preview is disabled
+```
+
+### Changed
+```diff
+- Updated for Minecraft 1.21.11 (works for both 1.21.10 and 1.21.11)
+```
+
 ## [1.0.5] - 2026-02-22
 
 ### Fixed

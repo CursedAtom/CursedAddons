@@ -46,6 +46,28 @@ Examples:
 ---
 
 <details>
+<summary><strong>Copy Chat Messages</strong></summary>
+
+Copy any chat message to the clipboard by right-clicking it.
+
+1. In the config screen, check **Enable Copy Chat Messages**
+2. Open the chat screen and right-click any message
+
+**Copy modes** (hold modifiers while right-clicking):
+
+| Keys | Mode |
+|---|---|
+| Right-click | Plain text (no formatting) |
+| Ctrl+Right-click | Legacy formatted text (§ color codes preserved) |
+| Ctrl+Shift+Right-click | Raw JSON component |
+
+A brief message will appear in the action bar after copying to inform you that the text has been copied.
+
+</details>
+
+---
+
+<details>
 <summary><strong>Click Events Preview</strong></summary>
 
 Shows a preview of what will happen when you click on interactive text in chat.
