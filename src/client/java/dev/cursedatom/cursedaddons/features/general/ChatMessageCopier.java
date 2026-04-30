@@ -19,6 +19,11 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
+/**
+ * Copies the contents of a chat line under the cursor to the clipboard.
+ * The modifier keys held at click-time select the format:
+ * plain text (no modifier), legacy {@code §}-formatted (Ctrl), or JSON component (Ctrl+Shift).
+ */
 public class ChatMessageCopier {
     private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
 
