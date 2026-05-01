@@ -118,15 +118,6 @@ public final class ImageHoverPreview {
     }
 
     /**
-     * Clears the image cache and URL resolver cache.
-     */
-    public static void clearCache() {
-        ImageCache.clear();
-        ImageTextureManager.clear();
-        UrlResolver.clearCache();
-    }
-
-    /**
      * Initializes the feature.
      */
     public static void init() {
