@@ -155,16 +155,22 @@ public class ChatNotifications {
             if (matches) {
                 // Play sound
                 if (notification.soundEnabled && !notification.sound.isEmpty()) {
+                    String soundToPlay = notification.sound;
                     try {
-                        String soundToPlay = notification.sound;
                         if (matcher != null && notification.regex) {
                             soundToPlay = replaceCaptureGroups(soundToPlay, matcher);
                         }
+                        float pitch = 1.0F;
+                        if (notification.pitch != null && !notification.pitch.isBlank()) {
+                            try {
+                                pitch = Math.max(0.5F, Math.min(2.0F, Float.parseFloat(notification.pitch.trim())));
+                            } catch (NumberFormatException ignored) {}
+                        }
                         Identifier soundLocation = Identifier.parse(soundToPlay);
                         Holder<SoundEvent> holder = BuiltInRegistries.SOUND_EVENT.get(soundLocation).orElseThrow();
-                        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(holder, 1.0F));
+                        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(holder.value(), pitch, 1.0F));
                     } catch (Exception e) {
-                        CursedAddons.LOGGER.warn("[CursedAddons] Invalid sound: " + notification.sound);
+                        CursedAddons.LOGGER.warn("[CursedAddons] Invalid sound: " + soundToPlay);
                     }
                 }
 

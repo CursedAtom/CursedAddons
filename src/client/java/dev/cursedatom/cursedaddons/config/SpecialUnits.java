@@ -78,6 +78,7 @@ public class SpecialUnits {
         public String pattern;
         public boolean regex;
         public String sound;
+        public String pitch;
         public boolean soundEnabled;
         public String title;
         public boolean titleEnabled;
@@ -89,6 +90,7 @@ public class SpecialUnits {
             this.pattern = "";
             this.regex = false;
             this.sound = "";
+            this.pitch = "1.0";
             this.soundEnabled = false;
             this.title = "";
             this.titleEnabled = false;
@@ -97,10 +99,11 @@ public class SpecialUnits {
             this.enabled = true;
         }
 
-        public NotificationUnit(String pattern, boolean regex, String sound, boolean soundEnabled, String title, boolean titleEnabled, String command, boolean commandEnabled, boolean enabled) {
+        public NotificationUnit(String pattern, boolean regex, String sound, String pitch, boolean soundEnabled, String title, boolean titleEnabled, String command, boolean commandEnabled, boolean enabled) {
             this.pattern = pattern;
             this.regex = regex;
             this.sound = sound;
+            this.pitch = pitch;
             this.soundEnabled = soundEnabled;
             this.title = title;
             this.titleEnabled = titleEnabled;

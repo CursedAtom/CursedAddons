@@ -38,6 +38,8 @@
   "cursedaddons.field.regex": "Use Regex",
   "cursedaddons.field.sound": "Sound",
   "cursedaddons.field.sound.hint": "Sound identifier",
+  "cursedaddons.field.pitch": "Pitch",
+  "cursedaddons.field.pitch.hint": "Pitch multiplier (0.5 – 2.0, default 1.0)",
   "cursedaddons.field.soundEnabled": "Enable Sound",
   "cursedaddons.field.title": "Title",
   "cursedaddons.field.title.hint": "Title to display",

@@ -5,6 +5,8 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.MultiLineEditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 
 import java.util.HashMap;
@@ -37,17 +39,36 @@ public class FieldWidgetFactory {
     }
 
     private AbstractWidget createTextWidget(FieldDefinition fieldDef, int x, int y, int width, int height, Object initialValue, Font font) {
-        EditBox editBox = new EditBox(font, x, y, width, height, trans(fieldDef.getLabelKey()));
-        if (fieldDef.getHintKey() != null) {
-            editBox.setHint(Component.literal(trans(fieldDef.getHintKey()).getString()));
+        Component label = trans(fieldDef.getLabelKey());
+        Component hint = fieldDef.getHintKey() != null ? trans(fieldDef.getHintKey()) : null;
+
+        if (Boolean.TRUE.equals(fieldDef.getTall())) {
+            MultiLineEditBox multiLine = MultiLineEditBox.builder()
+                .setX(x)
+                .setY(y)
+                .setPlaceholder(hint != null ? hint : Component.empty())
+                .build(font, width, height, label);
+            if (initialValue instanceof String) {
+                multiLine.setValue((String) initialValue);
+            }
+            if (hint != null) {
+                multiLine.setTooltip(Tooltip.create(hint));
+            }
+            return multiLine;
+        } else {
+            EditBox editBox = new EditBox(font, x, y, width, height, label);
+            if (hint != null) {
+                editBox.setHint(Component.literal(hint.getString()));
+                editBox.setTooltip(Tooltip.create(hint));
+            }
+            if (fieldDef.getMaxLength() != null) {
+                editBox.setMaxLength(fieldDef.getMaxLength());
+            }
+            if (initialValue instanceof String) {
+                editBox.setValue((String) initialValue);
+            }
+            return editBox;
         }
-        if (fieldDef.getMaxLength() != null) {
-            editBox.setMaxLength(fieldDef.getMaxLength());
-        }
-        if (initialValue instanceof String) {
-            editBox.setValue((String) initialValue);
-        }
-        return editBox;
     }
 
     private AbstractWidget createToggleWidget(FieldDefinition fieldDef, int x, int y, int width, int height, Object initialValue) {
@@ -125,6 +146,8 @@ public class FieldWidgetFactory {
             case "text":
                 if (widget instanceof EditBox) {
                     return ((EditBox) widget).getValue().trim();
+                } else if (widget instanceof MultiLineEditBox) {
+                    return ((MultiLineEditBox) widget).getValue().trim();
                 }
                 break;
             case "toggle":
