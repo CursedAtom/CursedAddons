@@ -77,57 +77,65 @@ public final class GifDecoder {
             String previousDisposal = "none";
             Rectangle previousBounds = null;
 
-            for (int i = 0; i < numFrames; i++) {
-                BufferedImage rawFrame = (i == 0) ? firstFrame : reader.read(i);
-                IIOMetadata metadata = reader.getImageMetadata(i);
+            try {
+                for (int i = 0; i < numFrames; i++) {
+                    BufferedImage rawFrame = (i == 0) ? firstFrame : reader.read(i);
+                    IIOMetadata metadata = reader.getImageMetadata(i);
 
-                FrameInfo info = parseFrameInfo(metadata, rawFrame);
-                delays[i] = info.delay;
+                    FrameInfo info = parseFrameInfo(metadata, rawFrame);
+                    delays[i] = info.delay;
 
-                // Apply disposal from the previous frame before drawing the new one
-                if (i > 0) {
-                    switch (previousDisposal) {
-                        case "restoreToBackgroundColor":
-                            if (previousBounds != null) {
-                                g.setComposite(AlphaComposite.Clear);
-                                g.fillRect(previousBounds.x, previousBounds.y,
-                                          previousBounds.width, previousBounds.height);
-                                g.setComposite(AlphaComposite.SrcOver);
-                            }
-                            break;
-                        case "restoreToPrevious":
-                            if (previousCanvas != null) {
-                                g.setComposite(AlphaComposite.Src);
-                                g.drawImage(previousCanvas, 0, 0, null);
-                                g.setComposite(AlphaComposite.SrcOver);
-                            }
-                            break;
-                        // "none" / "doNotDispose" — leave canvas as is
+                    // Apply disposal from the previous frame before drawing the new one
+                    if (i > 0) {
+                        switch (previousDisposal) {
+                            case "restoreToBackgroundColor":
+                                if (previousBounds != null) {
+                                    g.setComposite(AlphaComposite.Clear);
+                                    g.fillRect(previousBounds.x, previousBounds.y,
+                                              previousBounds.width, previousBounds.height);
+                                    g.setComposite(AlphaComposite.SrcOver);
+                                }
+                                break;
+                            case "restoreToPrevious":
+                                if (previousCanvas != null) {
+                                    g.setComposite(AlphaComposite.Src);
+                                    g.drawImage(previousCanvas, 0, 0, null);
+                                    g.setComposite(AlphaComposite.SrcOver);
+                                }
+                                break;
+                            // "none" / "doNotDispose" — leave canvas as is
+                        }
                     }
+
+                    // Save canvas before drawing if this frame's disposal is "restoreToPrevious"
+                    if ("restoreToPrevious".equals(info.disposal)) {
+                        if (previousCanvas != null) previousCanvas.flush();
+                        previousCanvas = copyImage(canvas);
+                    }
+
+                    // Draw current frame at its offset position (full resolution)
+                    g.drawImage(rawFrame, info.x, info.y, null);
+
+                    // Downscale composited frame using progressive scaling, then encode to PNG
+                    if (needsScaling) {
+                        BufferedImage scaled = ImageCache.progressiveDownscale(canvas, scaledWidth, scaledHeight);
+                        encodedFrames.add(ImageCache.bufferedToPng(scaled));
+                        scaled.flush();
+                    } else {
+                        encodedFrames.add(ImageCache.bufferedToPng(canvas));
+                    }
+
+                    previousDisposal = info.disposal;
+                    previousBounds = new Rectangle(info.x, info.y, rawFrame.getWidth(), rawFrame.getHeight());
+                    
+                    if (i > 0) rawFrame.flush();
                 }
-
-                // Save canvas before drawing if this frame's disposal is "restoreToPrevious"
-                if ("restoreToPrevious".equals(info.disposal)) {
-                    previousCanvas = copyImage(canvas);
-                }
-
-                // Draw current frame at its offset position (full resolution)
-                g.drawImage(rawFrame, info.x, info.y, null);
-
-                // Downscale composited frame using progressive scaling, then encode to PNG
-                if (needsScaling) {
-                    BufferedImage scaled = ImageCache.progressiveDownscale(canvas, scaledWidth, scaledHeight);
-                    encodedFrames.add(ImageCache.bufferedToPng(scaled));
-                    scaled.flush();
-                } else {
-                    encodedFrames.add(ImageCache.bufferedToPng(canvas));
-                }
-
-                previousDisposal = info.disposal;
-                previousBounds = new Rectangle(info.x, info.y, rawFrame.getWidth(), rawFrame.getHeight());
+            } finally {
+                g.dispose();
+                canvas.flush();
+                if (previousCanvas != null) previousCanvas.flush();
+                firstFrame.flush();
             }
-
-            g.dispose();
 
             return new GifData(encodedFrames, delays, scaledWidth, scaledHeight);
         } finally {
