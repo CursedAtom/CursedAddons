@@ -1,3 +1,25 @@
+## [1.0.7] - 2026-05-01
+
+### What's New
+```diff
++ Chat Notifications: added Pitch field for sound playback (0.5 – 2.0, default 1.0)
+```
+
+### Fixed
+```diff
+- Opening chat or commands with a modifier key (e.g. Ctrl) no longer deletes the first character typed
+- Click Events Preview no longer breaks in some edge cases
+- GIF frames are now properly disposed when decoding fails, preventing memory leaks
+- SSRF protection now checks each redirect hop *before* opening a TCP connection (previously the connection was made before the check, whoops!)
+- OG:Image URL resolution now correctly prepends the full origin for relative image paths (e.g. /img/cat.png -> https://example.com/img/cat.png)
+```
+
+### Changed
+```diff
+- Image texture cache now reserves a sub-limit of 5 GIF slots within the 50-texture total (e.g. 5 GIFs + 45 images, or 0 GIFs + 50 images)
+- GIF playback is now capped at 100 frames per GIF
+```
+
 ## [1.0.6] - 2026-04-10
 
 ### What's New
