@@ -14,6 +14,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPosition
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import org.joml.Vector2ic;
 import org.lwjgl.glfw.GLFW;
@@ -62,7 +63,7 @@ public abstract class DrawContextMixin {
     /**
      * For click-event-only styles (no HoverEvent), hoveredTextStyle is never set, so
      * componentHoverEffect is never called. clickableTextStyle IS set for these styles,
-     * so we call componentHoverEffect manually here when the feature is enabled.
+     * so call componentHoverEffect manually here when the feature is enabled.
      */
     @Inject(at = @At("RETURN"), method = "extractDeferredElements")
     private void cursedaddons$renderClickEventPreview(CallbackInfo ci) {
@@ -88,6 +89,17 @@ public abstract class DrawContextMixin {
         }
         if (ConfigProvider.getBoolean(ConfigKeys.CLICK_EVENTS_ENABLED, false)) {
             return ClickEventsPreviewer.enrichStyleWithPreview(style);
+        }
+        // Feature disabled: strip any blank ShowText placeholder injected at message-receive time
+        // for click-only / insertion-only styles, so an empty tooltip bubble doesn't render.
+        String insertion = style.getInsertion();
+        boolean hasClickOrInsertion = style.getClickEvent() != null
+                || (insertion != null && !insertion.isBlank());
+        if (hasClickOrInsertion && style.getHoverEvent() instanceof HoverEvent.ShowText st) {
+            Component val = st.value();
+            if (val == null || val.getString().isBlank()) {
+                return style.withHoverEvent(null);
+            }
         }
         return style;
     }
