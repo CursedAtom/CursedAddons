@@ -1,3 +1,10 @@
+## [1.0.8] - 2026-05-13
+
+### Changed
+```diff
++ Command Aliases: typing an alias in the chat box now shows live argument coloring and usage tooltips for the expanded command, no longer shows "unknown command"
+```
+
 ## [1.0.7] - 2026-05-01
 
 ### What's New
