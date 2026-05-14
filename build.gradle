@@ -1,5 +1,5 @@
 plugins {
-	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 	id 'com.modrinth.minotaur' version '2.+'
 }
@@ -36,13 +36,13 @@ loom {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	// mappings loom.officialMojangMappings()
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation "com.terraformersmc:modmenu:17.0.0-beta.2"
+    compileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
 }
 
 processResources {
@@ -54,7 +54,13 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
+	it.options.release = project.java_version.toInteger()
+}
+
+javadoc {
+	source += sourceSets.client.allJava
+	classpath += sourceSets.client.compileClasspath
+	options.addStringOption('Xdoclint:none', '-quiet')
 }
 
 java {
@@ -63,8 +69,8 @@ java {
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.toVersion(project.java_version)
+	targetCompatibility = JavaVersion.toVersion(project.java_version)
 }
 
 jar {
@@ -80,8 +86,8 @@ modrinth {
 	projectId = "31HzxX66"
 	versionNumber = project.mod_version
 	versionType = mod_version.contains("-") ? "beta" : "release"
-	uploadFile = remapJar
-	gameVersions = ["1.21.10", "1.21.11"]
+	uploadFile = tasks.jar
+	gameVersions = [project.minecraft_version]
 	loaders = ["fabric"]
 	changelog = System.getenv("CHANGELOG_BODY") ?: ""
 	dependencies {

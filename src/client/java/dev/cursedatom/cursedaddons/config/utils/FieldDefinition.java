@@ -18,6 +18,7 @@ public class FieldDefinition {
     private Integer maxLength;
     private Boolean required;
     private String dropdown;
+    private Boolean tall;
 
     public FieldDefinition() {}
 
@@ -99,5 +100,13 @@ public class FieldDefinition {
 
     public void setDropdown(String dropdown) {
         this.dropdown = dropdown;
+    }
+
+    public Boolean getTall() {
+        return tall;
+    }
+
+    public void setTall(Boolean tall) {
+        this.tall = tall;
     }
 }

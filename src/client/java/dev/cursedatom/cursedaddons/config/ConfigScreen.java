@@ -7,7 +7,7 @@ import dev.cursedatom.cursedaddons.config.utils.GenericEditScreen;
 import dev.cursedatom.cursedaddons.config.utils.Category;
 import dev.cursedatom.cursedaddons.config.utils.ConfigItem;
 import dev.cursedatom.cursedaddons.utils.ConfigProvider;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -238,7 +238,7 @@ public class ConfigScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         // Two overlapping fills: first darkens the entire screen, second marks the config panel bounds.
         guiGraphics.fill(0, 0, this.width, this.height, BG_COLOR);
 

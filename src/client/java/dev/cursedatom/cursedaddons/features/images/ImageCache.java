@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -303,20 +302,6 @@ public class ImageCache {
         int queryIndex = lower.indexOf('?');
         String path = queryIndex >= 0 ? lower.substring(0, queryIndex) : lower;
         return path.endsWith(".gif");
-    }
-
-    public static void clear() {
-        // Cancel all in-flight loading tasks
-        List<CompletableFuture<ImageResult>> futures = new ArrayList<>(loadingTasks.values());
-        loadingTasks.clear();
-        for (CompletableFuture<ImageResult> future : futures) {
-            future.cancel(true);
-        }
-
-        synchronized (cacheLock) {
-            cache.clear();
-        }
-        failedUrls.clear();
     }
 
     private static class CacheEntry {

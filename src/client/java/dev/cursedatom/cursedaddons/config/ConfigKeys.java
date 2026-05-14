@@ -1,7 +1,7 @@
 package dev.cursedatom.cursedaddons.config;
 
 /**
- * Central registry of all config key strings used to access values in {@link dev.cursedatom.cursedaddons.utils.ConfigStorage}.
+ * Central registry of all config key strings used to access values in {@link dev.cursedatom.cursedaddons.config.utils.ConfigStorage}.
  */
 public final class ConfigKeys {
     public static final String MACRO_ENABLED = "chatkeybindings.Macro.Enabled";

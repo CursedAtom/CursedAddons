@@ -116,6 +116,7 @@ Set up automatic notifications for specific chat messages using string matching 
    - **Pattern**: The text or regex pattern to match
    - **Use Regex**: Check if the pattern is a regular expression
    - **Play Sound**: Check to play a sound on match, and enter the sound resource location
+   - **Pitch**: The pitch multiplier for the sound (0.5 – 2.0, default 1.0)
    - **Set Title**: Check to set the window title on match, and enter the title text
    - **Send Command**: Check to send a command on match, and enter the command
    - **Enabled**: Check to activate the rule
@@ -123,6 +124,7 @@ Set up automatic notifications for specific chat messages using string matching 
 **Escape Sequences:**
 | Sequence | Meaning |
 |---|---|
+| `$x` | Matches regex group `x` and inserts it into the output | 
 | `\&` | Literal `&` in patterns and replacement text |
 | `\$` | Literal `$` in replacement text (commands, titles, sounds) |
 | `&0`–`&f`, `&k`–`&r` | Minecraft color/format codes in patterns |

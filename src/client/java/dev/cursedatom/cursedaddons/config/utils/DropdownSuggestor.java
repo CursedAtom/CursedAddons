@@ -2,15 +2,18 @@ package dev.cursedatom.cursedaddons.config.utils;
 
 import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.MultiLineEditBox;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 /**
- * Renders a dropdown suggestion list below an {@link net.minecraft.client.gui.components.EditBox}
+ * Renders a dropdown suggestion list below an {@link net.minecraft.client.gui.components.AbstractWidget}
+ * (supports {@link net.minecraft.client.gui.components.EditBox} and {@link net.minecraft.client.gui.components.MultiLineEditBox})
  * and handles keyboard and mouse navigation for picking a suggestion.
  */
 public class DropdownSuggestor {
@@ -21,7 +24,7 @@ public class DropdownSuggestor {
     private static final int TEXT_COLOR = 0xFFFFFFFF;
     private static final int SELECTED_COLOR = 0xFF3366AA;
 
-    private final EditBox editBox;
+    private final AbstractWidget widget;
     private final Font font;
     private final List<String> allItems;
 
@@ -30,10 +33,15 @@ public class DropdownSuggestor {
     private int scrollOffset = 0;
     private boolean visible = false;
 
-    public DropdownSuggestor(EditBox editBox, Font font, List<String> items) {
-        this.editBox = editBox;
+    public DropdownSuggestor(AbstractWidget widget, Font font, List<String> items) {
+        this.widget = widget;
         this.font = font;
         this.allItems = items;
+    }
+
+    private void setValue(String value) {
+        if (widget instanceof EditBox box) box.setValue(value);
+        else if (widget instanceof MultiLineEditBox box) box.setValue(value);
     }
 
     public void update(String text) {
@@ -56,12 +64,12 @@ public class DropdownSuggestor {
         visible = !filtered.isEmpty();
     }
 
-    public void render(GuiGraphics graphics, int mouseX, int mouseY) {
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (!visible || filtered.isEmpty()) return;
 
-        int x = editBox.getX();
-        int y = editBox.getY() + editBox.getHeight() + 1;
-        int w = editBox.getWidth();
+        int x = widget.getX();
+        int y = widget.getY() + widget.getHeight() + 1;
+        int w = widget.getWidth();
         int rows = Math.min(filtered.size(), MAX_VISIBLE);
         int h = rows * ROW_HEIGHT + 2;
 
@@ -84,7 +92,7 @@ public class DropdownSuggestor {
             String text = filtered.get(i);
             // Trim text to fit width
             String display = font.plainSubstrByWidth(text, w - 6);
-            graphics.drawString(font, display, x + 3, rowY + 2, TEXT_COLOR);
+            graphics.text(font, display, x + 3, rowY + 2, TEXT_COLOR);
         }
 
         // Scrollbar hint if there are more items
@@ -101,7 +109,7 @@ public class DropdownSuggestor {
         // Tab or Enter: accept
         if (keyCode == GLFW.GLFW_KEY_TAB || keyCode == GLFW.GLFW_KEY_ENTER) {
             if (selectedIndex >= 0 && selectedIndex < filtered.size()) {
-                editBox.setValue(filtered.get(selectedIndex));
+                setValue(filtered.get(selectedIndex));
                 visible = false;
                 return true;
             }
@@ -141,16 +149,16 @@ public class DropdownSuggestor {
     public boolean mouseClicked(double mouseX, double mouseY) {
         if (!visible || filtered.isEmpty()) return false;
 
-        int x = editBox.getX();
-        int y = editBox.getY() + editBox.getHeight() + 1;
-        int w = editBox.getWidth();
+        int x = widget.getX();
+        int y = widget.getY() + widget.getHeight() + 1;
+        int w = widget.getWidth();
         int rows = Math.min(filtered.size(), MAX_VISIBLE);
         int h = rows * ROW_HEIGHT + 2;
 
         if (mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + h) {
             int clickedRow = (int) ((mouseY - y - 1) / ROW_HEIGHT) + scrollOffset;
             if (clickedRow >= 0 && clickedRow < filtered.size()) {
-                editBox.setValue(filtered.get(clickedRow));
+                setValue(filtered.get(clickedRow));
                 visible = false;
             }
             return true;
@@ -162,9 +170,9 @@ public class DropdownSuggestor {
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
         if (!visible || filtered.size() <= MAX_VISIBLE) return false;
 
-        int x = editBox.getX();
-        int y = editBox.getY() + editBox.getHeight() + 1;
-        int w = editBox.getWidth();
+        int x = widget.getX();
+        int y = widget.getY() + widget.getHeight() + 1;
+        int w = widget.getWidth();
         int rows = Math.min(filtered.size(), MAX_VISIBLE);
         int h = rows * ROW_HEIGHT + 2;
 

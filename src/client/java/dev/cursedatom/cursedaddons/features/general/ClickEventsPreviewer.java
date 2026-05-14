@@ -21,6 +21,8 @@ import java.util.List;
 public class ClickEventsPreviewer {
     private ClickEventsPreviewer() {}
 
+    private static final Component MODIFIED_MARKER = TextUtils.trans("texts.PreviewClickEvents.overall");
+
     public static Style enrichStyleWithPreview(Style style) {
         if (style == null) {
             return null;
@@ -54,7 +56,7 @@ public class ClickEventsPreviewer {
                     entityContent = ((HoverEvent.ShowEntity) hoverEvent).entity();
                 }
                 if (hoverEvent instanceof HoverEvent.ShowItem) {
-                    itemStack = ((HoverEvent.ShowItem) hoverEvent).item();
+                    itemStack = ((HoverEvent.ShowItem) hoverEvent).item().create();
                 }
 
                 if (entityContent != null) {
@@ -64,11 +66,11 @@ public class ClickEventsPreviewer {
                             Screen.getTooltipFromItem(Minecraft.getInstance(), itemStack)
                     );
                 }
-                if (oldHoverComponent != null) {
+                if (oldHoverComponent != null && !oldHoverComponent.getString().isBlank()) {
                     Component newHoverComponent = (TextUtils.SPACER.copy().append(oldHoverComponent)).append(textToAppendWithTwoEmptyLinesInFront);
                     style = style.withHoverEvent(new HoverEvent.ShowText(newHoverComponent));
                 } else {
-                    style = style.withHoverEvent(new HoverEvent.ShowText(textToAppendWithTwoEmptyLinesInFront));
+                    style = style.withHoverEvent(new HoverEvent.ShowText(textToAppend));
                 }
             }
         }
@@ -156,6 +158,6 @@ public class ClickEventsPreviewer {
         if (tooltip == null || tooltip.getString().isBlank()) {
             return false;
         }
-        return tooltip.getString().contains(TextUtils.trans("texts.PreviewClickEvents.overall").getString());
+        return tooltip.getString().contains(MODIFIED_MARKER.getString());
     }
 }

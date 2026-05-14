@@ -7,10 +7,11 @@ import dev.cursedatom.cursedaddons.config.UnitTypeRegistry;
 import dev.cursedatom.cursedaddons.CursedAddons;
 import static dev.cursedatom.cursedaddons.utils.TextUtils.trans;
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -110,9 +111,11 @@ public class GenericEditScreen extends Screen {
             Object initialValue = initialValues.get(fieldDef.getName());
             AbstractWidget widget;
 
+            int currentHeight = ("text".equals(fieldDef.getType()) && Boolean.TRUE.equals(fieldDef.getTall())) ? 40 : buttonHeight;
+
             // Handle keybind fields specially to wire up the waiting callback
             if ("keybind".equals(fieldDef.getType())) {
-                widget = widgetFactory.createKeybindWidget(fieldDef, centerX, y, buttonWidth, buttonHeight, initialValue, (Button.OnPress) button -> {
+                widget = widgetFactory.createKeybindWidget(fieldDef, centerX, y, buttonWidth, currentHeight, initialValue, (Button.OnPress) button -> {
                     if (this.waitingButton != null) {
                         this.waitingButton.stopWaiting();
                     }
@@ -122,12 +125,12 @@ public class GenericEditScreen extends Screen {
                     this.waitingButton = keybindButton;
                 });
             } else {
-                widget = widgetFactory.createWidget(fieldDef, centerX, y, buttonWidth, buttonHeight, initialValue, this.font);
+                widget = widgetFactory.createWidget(fieldDef, centerX, y, buttonWidth, currentHeight, initialValue, this.font);
             }
 
             widgetMap.put(fieldDef.getName(), widget);
             this.addRenderableWidget(widget);
-            y += ("text".equals(fieldDef.getType()) ? 30 : 25);
+            y += (currentHeight + 10);
         }
 
         // Wire up dropdown suggestors for fields that have a dropdown provider
@@ -136,11 +139,16 @@ public class GenericEditScreen extends Screen {
             if (fieldDef.getDropdown() != null) {
                 Supplier<List<String>> provider = dropdownProviders.get(fieldDef.getDropdown());
                 AbstractWidget widget = widgetMap.get(fieldDef.getName());
-                if (provider != null && widget instanceof EditBox) {
-                    EditBox box = (EditBox) widget;
-                    DropdownSuggestor suggestor = new DropdownSuggestor(box, this.font, provider.get());
-                    box.setResponder(suggestor::update);
-                    dropdownSuggestors.add(suggestor);
+                if (provider != null) {
+                    if (widget instanceof EditBox box) {
+                        DropdownSuggestor suggestor = new DropdownSuggestor(box, this.font, provider.get());
+                        box.setResponder(suggestor::update);
+                        dropdownSuggestors.add(suggestor);
+                    } else if (widget instanceof MultiLineEditBox box) {
+                        DropdownSuggestor suggestor = new DropdownSuggestor(box, this.font, provider.get());
+                        box.setValueListener(suggestor::update);
+                        dropdownSuggestors.add(suggestor);
+                    }
                 }
             }
         }
@@ -175,8 +183,8 @@ public class GenericEditScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
         for (DropdownSuggestor suggestor : dropdownSuggestors) {
             suggestor.render(guiGraphics, mouseX, mouseY);
         }

@@ -21,6 +21,7 @@ public final class UrlResolver {
     private static final int READ_TIMEOUT_MS = 5_000;
     private static final int MAX_HTML_BYTES = 32 * 1024; // 32 KB
     private static final long FAILURE_COOLDOWN_MS = 60_000;
+    private static final int MAX_REDIRECTS = 5;
 
     private static final ConcurrentHashMap<String, String> resolvedCache = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, Long> failedCache = new ConcurrentHashMap<>();
@@ -98,59 +99,68 @@ public final class UrlResolver {
 
     private static String fetchOgImage(String url) throws Exception {
         URI uri = new URI(url);
-        InetAddress address = InetAddress.getByName(uri.toURL().getHost());
-        if (address.isLoopbackAddress() || address.isSiteLocalAddress() || address.isLinkLocalAddress()) {
-            throw new Exception("Connection to private/loopback addresses is not allowed");
+
+        for (int redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount++) {
+            // SSRF check before opening any connection to this host
+            InetAddress address = InetAddress.getByName(uri.toURL().getHost());
+            if (address.isLoopbackAddress() || address.isSiteLocalAddress() || address.isLinkLocalAddress()) {
+                throw new Exception("Connection to private/loopback addresses is not allowed");
+            }
+
+            HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+            try {
+                connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
+                connection.setReadTimeout(READ_TIMEOUT_MS);
+                connection.setInstanceFollowRedirects(false);
+                connection.setRequestProperty("Accept", "text/html");
+                connection.setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; ImagePreview/1.0)");
+                connection.connect();
+
+                int responseCode = connection.getResponseCode();
+
+                if (responseCode >= 300 && responseCode < 400) {
+                    String location = connection.getHeaderField("Location");
+                    if (location == null) throw new Exception("Redirect with no Location header");
+                    uri = uri.resolve(location);
+                    String scheme = uri.getScheme();
+                    if (!"http".equals(scheme) && !"https".equals(scheme)) {
+                        throw new Exception("Redirect to non-HTTP scheme blocked: " + scheme);
+                    }
+                    continue;
+                }
+
+                if (responseCode != 200) {
+                    throw new Exception("HTTP " + responseCode);
+                }
+
+                try (InputStream stream = connection.getInputStream()) {
+                    byte[] buffer = new byte[MAX_HTML_BYTES];
+                    int totalRead = 0;
+                    int bytesRead;
+                    while (totalRead < MAX_HTML_BYTES && (bytesRead = stream.read(buffer, totalRead, MAX_HTML_BYTES - totalRead)) != -1) {
+                        totalRead += bytesRead;
+                    }
+
+                    String html = new String(buffer, 0, totalRead, StandardCharsets.UTF_8);
+
+                    Matcher matcher = OG_IMAGE_PATTERN.matcher(html);
+                    if (matcher.find()) {
+                        return uri.resolve(matcher.group(1)).toString();
+                    }
+
+                    matcher = OG_IMAGE_PATTERN_ALT.matcher(html);
+                    if (matcher.find()) {
+                        return uri.resolve(matcher.group(1)).toString();
+                    }
+                }
+
+                return null;
+            } finally {
+                connection.disconnect();
+            }
         }
 
-        HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
-        try {
-            connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
-            connection.setReadTimeout(READ_TIMEOUT_MS);
-            connection.setInstanceFollowRedirects(true);
-            connection.setRequestProperty("Accept", "text/html");
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; ImagePreview/1.0)");
-            connection.connect();
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode != 200) {
-                throw new Exception("HTTP " + responseCode);
-            }
-
-            // Post-redirect SSRF check
-            String finalHost = connection.getURL().getHost();
-            if (!finalHost.equals(uri.toURL().getHost())) {
-                InetAddress finalAddress = InetAddress.getByName(finalHost);
-                if (finalAddress.isLoopbackAddress() || finalAddress.isSiteLocalAddress() || finalAddress.isLinkLocalAddress()) {
-                    throw new Exception("Redirect to private/loopback address blocked");
-                }
-            }
-
-            try (InputStream stream = connection.getInputStream()) {
-                byte[] buffer = new byte[MAX_HTML_BYTES];
-                int totalRead = 0;
-                int bytesRead;
-                while (totalRead < MAX_HTML_BYTES && (bytesRead = stream.read(buffer, totalRead, MAX_HTML_BYTES - totalRead)) != -1) {
-                    totalRead += bytesRead;
-                }
-
-                String html = new String(buffer, 0, totalRead, StandardCharsets.UTF_8);
-
-                Matcher matcher = OG_IMAGE_PATTERN.matcher(html);
-                if (matcher.find()) {
-                    return matcher.group(1);
-                }
-
-                matcher = OG_IMAGE_PATTERN_ALT.matcher(html);
-                if (matcher.find()) {
-                    return matcher.group(1);
-                }
-            }
-
-            return null;
-        } finally {
-            connection.disconnect();
-        }
+        throw new Exception("Too many redirects");
     }
 
     private interface PlatformResolver {

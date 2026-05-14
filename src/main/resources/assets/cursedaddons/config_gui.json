@@ -182,9 +182,18 @@
               "name": "sound",
               "type": "text",
               "dropdown": "sound_event",
+              "tall": true,
               "labelKey": "field.sound",
               "hintKey": "field.sound.hint",
               "maxLength": 1000,
+              "required": false
+            },
+            {
+              "name": "pitch",
+              "type": "text",
+              "labelKey": "field.pitch",
+              "hintKey": "field.pitch.hint",
+              "maxLength": 8,
               "required": false
             },
             {

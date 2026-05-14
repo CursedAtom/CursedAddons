@@ -8,7 +8,7 @@ import dev.cursedatom.cursedaddons.config.ConfigKeys;
 import dev.cursedatom.cursedaddons.mixin.client.ChatComponentAccessor;
 import dev.cursedatom.cursedaddons.utils.ConfigProvider;
 import dev.cursedatom.cursedaddons.utils.TextUtils;
-import net.minecraft.client.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;
@@ -19,6 +19,11 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
+/**
+ * Copies the contents of a chat line under the cursor to the clipboard.
+ * The modifier keys held at click-time select the format:
+ * plain text (no modifier), legacy {@code §}-formatted (Ctrl), or JSON component (Ctrl+Shift).
+ */
 public class ChatMessageCopier {
     private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
 

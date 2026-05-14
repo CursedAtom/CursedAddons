@@ -23,7 +23,8 @@ public final class ImageTextureManager {
     private static final Map<String, TextureEntry> staticCache = new LinkedHashMap<>();
     private static final Map<String, AnimatedTextureEntry> animatedCache = new LinkedHashMap<>();
     private static final Object textureCacheLock = new Object();
-    private static final int MAX_TOTAL_TEXTURES = 50;
+    private static final int MAX_TOTAL_IMAGES = 50;
+    private static final int MAX_GIF_IMAGES = 5;
     private static final AtomicLong textureIdCounter = new AtomicLong(0);
 
     private ImageTextureManager() {}
@@ -103,7 +104,7 @@ public final class ImageTextureManager {
         int[] delays = result.getGifDelays();
         if (framePngData == null || delays == null) return;
 
-        final int MAX_GIF_FRAMES = MAX_TOTAL_TEXTURES / 2;
+        final int MAX_GIF_FRAMES = 100; // Hard cap per GIF
         int totalFrames = framePngData.length;
         if (totalFrames > MAX_GIF_FRAMES) {
             byte[][] truncated = new byte[MAX_GIF_FRAMES][];
@@ -259,22 +260,6 @@ public final class ImageTextureManager {
         Minecraft.getInstance().execute(() -> removeTexture(cacheKey));
     }
 
-    public static void clear() {
-        var textureManager = Minecraft.getInstance().getTextureManager();
-
-        synchronized (textureCacheLock) {
-            for (TextureEntry entry : staticCache.values()) {
-                textureManager.release(entry.textureLocation);
-            }
-            staticCache.clear();
-
-            for (AnimatedTextureEntry entry : animatedCache.values()) {
-                releaseAnimatedEntry(entry);
-            }
-            animatedCache.clear();
-        }
-    }
-
     public static void removeTexture(String cacheKey) {
         synchronized (textureCacheLock) {
             TextureEntry staticEntry = staticCache.remove(cacheKey);
@@ -317,21 +302,19 @@ public final class ImageTextureManager {
         }
     }
 
-    private static int getTotalTextureCount() {
-        // Caller must hold textureCacheLock — only count actually registered textures
-        int count = staticCache.size();
-        for (AnimatedTextureEntry entry : animatedCache.values()) {
-            for (Identifier loc : entry.frameLocations) {
-                if (loc != null) count++;
-            }
-        }
-        return count;
-    }
-
     private static void enforceCacheLimit() {
         synchronized (textureCacheLock) {
-            while (getTotalTextureCount() > MAX_TOTAL_TEXTURES) {
-                // Evict oldest static entry first (cheaper to re-create), then oldest animated
+            // First, enforce GIF limit
+            while (animatedCache.size() > MAX_GIF_IMAGES) {
+                String firstKey = animatedCache.keySet().iterator().next();
+                AnimatedTextureEntry entry = animatedCache.remove(firstKey);
+                if (entry != null) {
+                    releaseAnimatedEntry(entry);
+                }
+            }
+
+            // Then, enforce total image limit (treating GIF as 1 image)
+            while ((staticCache.size() + animatedCache.size()) > MAX_TOTAL_IMAGES) {
                 if (!staticCache.isEmpty()) {
                     String firstKey = staticCache.keySet().iterator().next();
                     TextureEntry entry = staticCache.remove(firstKey);

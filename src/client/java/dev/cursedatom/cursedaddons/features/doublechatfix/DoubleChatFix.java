@@ -13,7 +13,8 @@ import net.minecraft.world.InteractionResult;
 public class DoubleChatFix {
     private DoubleChatFix() {}
 
-    private static boolean cancelNextChar = false;
+    private static long cancelExpiryTime = 0;
+    private static final long EXPIRY_MS = 50;
 
     public static void init() {
         KeyboardKeyPressedCallback.EVENT.register((window, keyCode, keyEvent) -> {
@@ -29,15 +30,15 @@ public class DoubleChatFix {
             if (client.options.keyChat.matches(keyEvent) ||
                 client.options.keyCommand.matches(keyEvent) ||
                 client.options.keyInventory.matches(keyEvent)) { // this one is for the creative search bar
-                cancelNextChar = true;
+                cancelExpiryTime = System.currentTimeMillis() + EXPIRY_MS;
             }
 
             return InteractionResult.PASS;
         });
 
         KeyboardCharTypedCallback.EVENT.register((window, characterEvent) -> {
-            if (cancelNextChar) {
-                cancelNextChar = false;
+            if (System.currentTimeMillis() < cancelExpiryTime) {
+                cancelExpiryTime = 0;
                 return InteractionResult.FAIL;
             }
             return InteractionResult.PASS;
