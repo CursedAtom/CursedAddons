@@ -15,13 +15,13 @@ CursedAddons is a Minecraft Fabric mod that enhances chat functionality with key
 ## Installation
 
 ### Prerequisites
-*   Minecraft Java Edition `1.21.11` (currently supported; future versions may be supported in updates)
-*   Fabric Loader `0.18.2` or newer
-*   Fabric API `0.141.3+1.21.11` or newer
+*   Minecraft Java Edition `26.1.2` (currently supported; future versions may be supported in updates)
+*   Fabric Loader `0.18.6` or newer
+*   Fabric API `0.145.4+26.1.2` or newer
 
 ### Steps
-1.  **Install Fabric Loader:** If you haven't already, download and install the Fabric Loader for Minecraft `1.21.11` from the [Fabric website](https://fabricmc.net/use/).
-2.  **Download Fabric API:** Download the Fabric API for `1.21.11` from its [Modrinth page](https://modrinth.com/mod/fabric-api).
+1.  **Install Fabric Loader:** If you haven't already, download and install the Fabric Loader for Minecraft `26.1.2` from the [Fabric website](https://fabricmc.net/use/).
+2.  **Download Fabric API:** Download the Fabric API for `26.1.2` from its [Modrinth page](https://modrinth.com/mod/fabric-api).
 3.  **Download CursedAddons**
 4.  **Place Mods in `mods` folder:**
     *   Locate your Minecraft installation directory.
@@ -47,7 +47,7 @@ For debugging ChatNotifications regex patterns, use the [online regex tester](ht
 ## Building from Source
 
 ### Prerequisites
-*   Java Development Kit (JDK) `21`
+*   Java Development Kit (JDK) `25`
 *   Git
 
 ### Steps
